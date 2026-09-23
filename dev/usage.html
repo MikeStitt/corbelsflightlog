@@ -368,6 +368,22 @@ that converts from Pedro’s inches and corner origin.</p>
 <p>A 3D rotation is a quaternion, not three angles: <code class="docutils literal notranslate"><span class="pre">Rotation3d</span></code> is
 <code class="docutils literal notranslate"><span class="pre">Quaternion</span> <span class="pre">q</span></code>, and <code class="docutils literal notranslate"><span class="pre">Pose3d</span></code> is 56 bytes. The yaw/pitch/roll form applies roll,
 then pitch, then yaw.</p>
+<section id="from-the-ftc-sdk">
+<h3>From the FTC SDK<a class="headerlink" href="#from-the-ftc-sdk" title="Link to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">corbelsflightlog-ftc</span></code> converts the SDK’s own geometry:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">FtcGeometry</span><span class="p">.</span><span class="na">pose3d</span><span class="p">(</span><span class="n">log</span><span class="p">,</span><span class="w"> </span><span class="s">"AprilTag/Robot"</span><span class="p">,</span><span class="w"> </span><span class="n">detection</span><span class="p">.</span><span class="na">robotPose</span><span class="p">);</span><span class="w">   </span><span class="c1">// Pose3D -&gt; Pose3d</span>
+<span class="n">FtcGeometry</span><span class="p">.</span><span class="na">rotation3d</span><span class="p">(</span><span class="n">log</span><span class="p">,</span><span class="w"> </span><span class="s">"imu/Rotation"</span><span class="p">,</span><span class="w"> </span><span class="n">imu</span><span class="p">.</span><span class="na">getRobotYawPitchRollAngles</span><span class="p">());</span>
+<span class="n">FtcGeometry</span><span class="p">.</span><span class="na">heading</span><span class="p">(</span><span class="n">log</span><span class="p">,</span><span class="w"> </span><span class="s">"imu/Heading"</span><span class="p">,</span><span class="w"> </span><span class="n">imu</span><span class="p">.</span><span class="na">getRobotYawPitchRollAngles</span><span class="p">());</span>
+</pre></div>
+</div>
+<p>A <code class="docutils literal notranslate"><span class="pre">Position</span></code> is converted to metres from whatever unit it carries.
+<code class="docutils literal notranslate"><span class="pre">YawPitchRollAngles</span></code> is documented as yaw, then pitch, then roll, applied
+intrinsically, with <strong>pitch about X and roll about Y</strong>; WPILib’s own
+yaw/pitch/roll constructor names those axes the other way round, so the angles
+are composed here in the SDK’s order and axes and written as a quaternion.
+The SDK notes that a <code class="docutils literal notranslate"><span class="pre">Pose3D</span></code>’s axis mapping is defined by whatever produced
+it, so check the docs of the API you got it from.</p>
+</section>
 </section>
 <section id="only-changes-are-recorded">
 <h2>Only changes are recorded<a class="headerlink" href="#only-changes-are-recorded" title="Link to this heading">¶</a></h2>
@@ -448,7 +464,10 @@ robot loses power, the last second or so is lost; <code class="docutils literal 
 <li><a class="reference internal" href="#">Logging values</a><ul>
 <li><a class="reference internal" href="#opening-and-closing-a-log">Opening and closing a log</a></li>
 <li><a class="reference internal" href="#the-value-types">The value types</a></li>
-<li><a class="reference internal" href="#geometry">Geometry</a></li>
+<li><a class="reference internal" href="#geometry">Geometry</a><ul>
+<li><a class="reference internal" href="#from-the-ftc-sdk">From the FTC SDK</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#only-changes-are-recorded">Only changes are recorded</a></li>
 <li><a class="reference internal" href="#one-type-per-key">One type per key</a></li>
 <li><a class="reference internal" href="#flushing">Flushing</a></li>

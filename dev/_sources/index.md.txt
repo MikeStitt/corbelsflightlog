@@ -19,7 +19,7 @@ FlightLog.event("kicker fired");           // one-off, with its exact time
 |---|---|---|
 | `corbelsflightlog-core` | nothing | The WPILOG writer and the logger. Any Java project. |
 | `corbelsflightlog-pedro` | Pedro Pathing | The follower's pose, path, aim point and debug data |
-| `corbelsflightlog-ftc` | FTC SDK, Panels | Logging to the Control Hub; mirroring values to Panels |
+| `corbelsflightlog-ftc` | FTC SDK, Panels | Logging to the Control Hub; mirroring values to Panels; SDK geometry |
 
 ```{toctree}
 :maxdepth: 2

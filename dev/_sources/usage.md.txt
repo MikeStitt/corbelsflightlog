@@ -67,6 +67,24 @@ A 3D rotation is a quaternion, not three angles: `Rotation3d` is
 `Quaternion q`, and `Pose3d` is 56 bytes. The yaw/pitch/roll form applies roll,
 then pitch, then yaw.
 
+### From the FTC SDK
+
+`corbelsflightlog-ftc` converts the SDK's own geometry:
+
+```java
+FtcGeometry.pose3d(log, "AprilTag/Robot", detection.robotPose);   // Pose3D -> Pose3d
+FtcGeometry.rotation3d(log, "imu/Rotation", imu.getRobotYawPitchRollAngles());
+FtcGeometry.heading(log, "imu/Heading", imu.getRobotYawPitchRollAngles());
+```
+
+A `Position` is converted to metres from whatever unit it carries.
+`YawPitchRollAngles` is documented as yaw, then pitch, then roll, applied
+intrinsically, with **pitch about X and roll about Y**; WPILib's own
+yaw/pitch/roll constructor names those axes the other way round, so the angles
+are composed here in the SDK's order and axes and written as a quaternion.
+The SDK notes that a `Pose3D`'s axis mapping is defined by whatever produced
+it, so check the docs of the API you got it from.
+
 ## Only changes are recorded
 
 A value is written when it differs from the last one under that key.
