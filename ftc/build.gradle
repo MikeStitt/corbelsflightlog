@@ -19,13 +19,23 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
     publishing { singleVariant('release') }
+
+    testOptions {
+        // Android classes are empty stubs in JVM unit tests; without this they
+        // throw instead of returning defaults.
+        unitTests.returnDefaultValues = true
+    }
 }
 
 dependencies {
     api project(':core')
     // compileOnly: the robot project supplies its own FTC SDK and Panels.
-    compileOnly 'org.firstinspires.ftc:RobotCore:12.0.0'
+    compileOnly "org.firstinspires.ftc:RobotCore:${ftcSdkVersion}"
     compileOnly "com.bylazar:fullpanels:${panelsVersion}"
+    // compileOnly does not extend the test classpath, so the unit tests need
+    // these declared again.
+    testImplementation "org.firstinspires.ftc:RobotCore:${ftcSdkVersion}"
+    testImplementation 'junit:junit:4.13.2'
 }
 
 afterEvaluate {
