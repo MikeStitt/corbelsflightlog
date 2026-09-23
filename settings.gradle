@@ -6,6 +6,13 @@ pluginManagement {
     }
 }
 
+// Lets `./gradlew updateDaemonJvm` record which JDK builds this project, and
+// lets a machine without that JDK download one. Without it, updateDaemonJvm
+// fails with "Toolchain download repositories have not been configured".
+plugins {
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '0.10.0'
+}
+
 rootProject.name = 'corbelsflightlog'
 
 include ':core'

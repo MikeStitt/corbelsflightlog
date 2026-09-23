@@ -1,0 +1,13 @@
+# JitPack builds a tag the first time someone asks for it. Two things it does
+# not get right by default for this project:
+#   * its default JDK is 8, and this build needs 17;
+#   * for Gradle projects it runs `./gradlew install`, which does not exist
+#     with the maven-publish plugin.
+# UNVERIFIED: nothing here has been run against JitPack yet. Check the build log
+# at https://jitpack.io/com/github/MikeStitt/corbelsflightlog/<tag>/build.log
+# after the first tag.
+jdk:
+  - openjdk17
+
+install:
+  - ./gradlew :core:publishToMavenLocal :pedro:publishToMavenLocal
