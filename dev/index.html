@@ -296,7 +296,7 @@ recorded only when it changes:</p>
 <li class="toctree-l1"><a class="reference internal" href="pedro.html">Pedro Pathing</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="pedro.html#the-follower-s-state-record-follower">The follower’s state — <code class="docutils literal notranslate"><span class="pre">record(Follower)</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="pedro.html#pedro-s-own-debug-data-record-followerlog">Pedro’s own debug data — <code class="docutils literal notranslate"><span class="pre">record(FollowerLog)</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="pedro.html#two-traps-this-handles-for-you">Two traps this handles for you</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pedro.html#what-gets-logged-when-there-is-no-path">What gets logged when there is no path</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="viewing.html">Viewing a log</a><ul>
@@ -307,7 +307,6 @@ recorded only when it changes:</p>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="format.html">The file format</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="format.html#poses">Poses</a></li>
-<li class="toctree-l2"><a class="reference internal" href="format.html#a-wpilib-bug-worth-knowing">A WPILib bug worth knowing</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a><ul>
@@ -328,9 +327,10 @@ site is built, so they are dead in a local <code class="docutils literal notrans
 </section>
 <section id="why-it-exists">
 <h2>Why it exists<a class="headerlink" href="#why-it-exists" title="Link to this heading">¶</a></h2>
-<p>A dashboard shows a robot what is happening <em>now</em>. It samples — Panels every
-75 ms — and forgets. A WPILOG file keeps every change, survives the match, and
-opens later in a tool built for reading it. The two answer different questions,
+<p>A dashboard shows what a robot is doing <em>now</em>, and is gone when the match ends.
+Panels samples periodically and forgets.
+A WPILOG file keeps every change, survives the match, and opens later in a tool
+built for reading it. The two answer different questions,
 and this library is the second one.</p>
 </section>
 </section>

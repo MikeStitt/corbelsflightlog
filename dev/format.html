@@ -255,14 +255,6 @@ y and rotation — with the schema entries AdvantageScope needs
 (<code class="docutils literal notranslate"><span class="pre">/.schema/struct:Pose2d</span></code> and its parts), exactly as WPILib’s <code class="docutils literal notranslate"><span class="pre">addStructSchema</span></code>
 writes them.</p>
 </section>
-<section id="a-wpilib-bug-worth-knowing">
-<h2>A WPILib bug worth knowing<a class="headerlink" href="#a-wpilib-bug-worth-knowing" title="Link to this heading">¶</a></h2>
-<p>WPILib’s <strong>Java</strong> reader, <code class="docutils literal notranslate"><span class="pre">DataLogIterator.hasNext()</span></code>, only reports another
-record when 16 or more bytes remain, but a record can be as small as 5 bytes.
-A plain <code class="docutils literal notranslate"><span class="pre">for</span> <span class="pre">(DataLogRecord</span> <span class="pre">r</span> <span class="pre">:</span> <span class="pre">reader)</span></code> loop therefore drops the last records
-of a log. <code class="docutils literal notranslate"><span class="pre">forEachRemaining()</span></code> is correct. This affects anyone reading logs in
-Java; AdvantageScope has its own decoder and is unaffected.</p>
-</section>
 </section>
 
         </article>
@@ -322,7 +314,6 @@ Java; AdvantageScope has its own decoder and is unaffected.</p>
             <ul>
 <li><a class="reference internal" href="#">The file format</a><ul>
 <li><a class="reference internal" href="#poses">Poses</a></li>
-<li><a class="reference internal" href="#a-wpilib-bug-worth-knowing">A WPILib bug worth knowing</a></li>
 </ul>
 </li>
 </ul>

@@ -128,7 +128,8 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#describe(com.pedropathing.follower.FollowerLog)" class="member-name-link">describe</a><wbr>(com.pedropathing.follower.FollowerLog&nbsp;l)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
-<div class="block">One line of text for a dashboard.</div>
+<div class="block">One line of text for a dashboard, built from the maps directly so that a
+  null map is rendered rather than dereferenced.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#record(com.pedropathing.follower.Follower)" class="member-name-link">record</a><wbr>(com.pedropathing.follower.Follower&nbsp;follower)</code></div>
@@ -198,17 +199,16 @@ loadScripts(document, 'script');</script>
  <code>&lt;prefix&gt;/&lt;map&gt;/&lt;entry&gt;</code>. Wire with
  <code>follower.withLogger(pedroLog::record)</code>.
 
- <p>In teleop the <code>algorithm</code> entries are stale: Pedro's algorithm
- doesn't run in manual mode.</div>
+ <p>Each entry holds whatever Pedro reported on the most recent update, so
+ read them alongside <code>&lt;prefix&gt;/Mode</code>.</div>
 </section>
 </li>
 <li>
 <section class="detail" id="describe(com.pedropathing.follower.FollowerLog)">
 <h3>describe</h3>
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">describe</span><wbr><span class="parameters">(com.pedropathing.follower.FollowerLog&nbsp;l)</span></div>
-<div class="block">One line of text for a dashboard. Not FollowerLog.toString(), which
-  throws if a map is null -- which a team's own Drivetrain or Localizer
-  could return from debug(), inside follower.update().</div>
+<div class="block">One line of text for a dashboard, built from the maps directly so that a
+  null map is rendered rather than dereferenced.</div>
 </section>
 </li>
 </ul>
