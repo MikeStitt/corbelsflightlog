@@ -6,6 +6,9 @@ on:
   pull_request:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
@@ -16,6 +19,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      # The repo ships gradle-wrapper.jar; check it is a genuine release.
+      - uses: gradle/actions/wrapper-validation@v4
       - uses: actions/setup-java@v4
         with:
           java-version: '17'
@@ -28,11 +33,17 @@ jobs:
         with:
           name: test-reports
           path: '*/build/reports/tests/test'
+          if-no-files-found: ignore
       - name: Upload the files the WPILib parity tests compare
         uses: actions/upload-artifact@v4
         with:
           name: logcheck-files
           path: core/build/logcheck
+          # ParityFilesTest SKIPS itself if it can't find the scenario file, and
+          # then writes nothing. Without this, the upload quietly produces no
+          # artifact and the parity job below fails with "artifact not found"
+          # instead of naming the real cause.
+          if-no-files-found: error
 
   wpilib-parity:
     name: WPILib parity (robotpy)
@@ -56,11 +67,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: gradle/actions/wrapper-validation@v4
       - uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: temurin
       # :ftc is an Android library and is only included when an SDK is present.
+      # setup-android sets ANDROID_HOME, which settings.gradle looks for.
       - uses: android-actions/setup-android@v3
       - uses: gradle/actions/setup-gradle@v4
+      - name: Fail early if settings.gradle did not include :ftc
+        run: ./gradlew projects | grep -q "':ftc'" || {
+             echo 'The :ftc module was not included -- no Android SDK was detected.'; exit 1; }
       - run: ./gradlew :ftc:assembleRelease --stacktrace
+      - name: Upload the AAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: ftc-aar
+          path: ftc/build/outputs/aar/*.aar
+          if-no-files-found: error

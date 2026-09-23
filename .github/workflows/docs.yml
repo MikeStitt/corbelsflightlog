@@ -10,6 +10,13 @@ on:
 permissions:
   contents: write
 
+# Both this and release.yml push to the gh-pages branch. Without a shared
+# concurrency group, a release and a docs build racing each other can leave one
+# version missing. Do NOT cancel in progress: each run publishes its own version.
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
 jobs:
   docs:
     runs-on: ubuntu-latest
