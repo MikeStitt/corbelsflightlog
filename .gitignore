@@ -1,0 +1,17 @@
+# Gradle
+.gradle/
+build/
+local.properties
+
+# Docs
+docs/_build/
+docs/_site/
+
+# Python
+__pycache__/
+*.pyc
+
+# IDE
+.idea/
+*.iml
+.DS_Store

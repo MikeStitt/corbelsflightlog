@@ -1,0 +1,88 @@
+# Shared WPILib-parity scenario. Read by BOTH:
+#   TeamCode/src/test/java/org/firstinspires/ftc/teamcode/logging/ParityFilesTest.java
+#     -> writes it with our writer (TeamCode/build/logcheck/)
+#   tools/logcheck/test_wpilib_parity.py
+#     -> writes it with WPILib's native writer and compares
+#
+# Tab-separated. Lines starting with # are comments.
+#   header  <extra header text>
+#   start   <timestamp_us>  <name>  <type>  <metadata>
+#   data    <timestamp_us>  <name>  <value>
+#   finish  <timestamp_us>  <name>
+#   pose    <x_in>  <y_in>  <heading_deg>        (Pedro coordinates)
+# Timestamps must be > 0: WPILib's writer treats 0 as "now".
+# Values: numbers as Java/Python both parse them (NaN, Infinity, -0.0 allowed);
+# booleans true/false; arrays comma-separated, empty field = empty array;
+# raw as hex; strings as-is (no tabs).
+# A field missing at the end of a line is empty (e.g. no metadata, an empty
+# string or array), so stripping trailing whitespace is harmless.
+
+header	Corbels parity é 🤖
+
+# every scalar type
+start	1000	/double	double
+data	2000	/double	1.5
+data	2001	/double	-0.0
+data	2002	/double	NaN
+data	2003	/double	-Infinity
+data	2004	/double	1.7976931348623157E308
+data	2005	/double	4.9E-324
+start	1000	/float	float	{"unit":"m"}
+data	3000	/float	0.1
+data	3001	/float	-0.0
+data	3002	/float	3.4028235E38
+start	1000	/int64	int64
+data	4000	/int64	3
+data	4001	/int64	-1
+data	4002	/int64	-9223372036854775808
+data	4003	/int64	9223372036854775807
+start	1000	/boolean	boolean
+data	5000	/boolean	true
+data	5001	/boolean	false
+start	1000	/string	string	{"source":"parity"}
+data	6000	/string	héllo 🤖
+data	6001	/string
+data	6002	/string	a string with spaces, commas; and "quotes"
+start	1000	/raw	raw
+data	7000	/raw	0102ff00
+data	7001	/raw
+
+# every array type, including empty
+start	1000	/double[]	double[]
+data	8000	/double[]	1,2.5,-0.0,NaN
+data	8001	/double[]
+start	1000	/int64[]	int64[]
+data	9000	/int64[]	1,-2,9223372036854775807
+data	9001	/int64[]
+start	1000	/boolean[]	boolean[]
+data	10000	/boolean[]	true,false,true
+data	10001	/boolean[]
+
+# timestamp field widths: 1 to 8 bytes
+start	1	/ts	boolean
+data	255	/ts	true
+data	256	/ts	true
+data	65536	/ts	true
+data	16777216	/ts	true
+data	4294967296	/ts	true
+data	1099511627776	/ts	true
+data	281474976710656	/ts	true
+data	72057594037927936	/ts	true
+
+# payload-size field widths: a 300-byte raw record needs a 2-byte size
+start	1000	/big	raw
+data	11000	/big	abababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababab
+
+# a name and metadata in UTF-8, and Finish records
+start	1000	/moteur/vitesse é	double	{"unité":"m/s"}
+data	12000	/moteur/vitesse é	2.0
+finish	90000	/double
+finish	90001	/moteur/vitesse é
+
+# Pedro poses, converted to AdvantageScope's field frame for each quarter turn
+pose	0	0	0
+pose	72	72	0
+pose	144	0	90
+pose	10	130	-57.3
+pose	36	72	401
+pose	144	144	359.9

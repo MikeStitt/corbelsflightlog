@@ -1,0 +1,33 @@
+name: Docs (development)
+
+# Publishes the docs for main as the "dev" version, next to the releases.
+on:
+  push:
+    branches: [main]
+    paths: ['docs/**', '**/*.java', '.github/workflows/docs.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: temurin
+      - uses: gradle/actions/setup-gradle@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r docs/requirements.txt
+      - run: ./gradlew :core:javadoc :pedro:javadoc
+      - run: python docs/build_site.py --version dev
+      - uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/_site
+          keep_files: true

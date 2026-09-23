@@ -1,0 +1,12 @@
+plugins {
+    id 'java-library' apply false
+}
+
+subprojects {
+    repositories {
+        mavenCentral()
+        maven { url = 'https://repo.dairy.foundation/releases' }   // Pedro Pathing
+        maven { url = 'https://mymaven.bylazar.com/releases' }     // Panels
+        google()
+    }
+}

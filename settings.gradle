@@ -1,0 +1,17 @@
+rootProject.name = 'flightlog'
+
+include ':core'
+include ':pedro'
+
+// The FTC module is an Android library: it needs the Android SDK and the FTC
+// SDK, which a plain JVM build doesn't have. Include it only when an Android
+// SDK is present (local.properties, ANDROID_HOME or ANDROID_SDK_ROOT), so
+// `./gradlew build` works anywhere and CI can still build it on a runner with
+// the SDK installed.
+def hasAndroidSdk = file('local.properties').exists() ||
+        System.getenv('ANDROID_HOME') || System.getenv('ANDROID_SDK_ROOT')
+if (hasAndroidSdk) {
+    include ':ftc'
+} else {
+    logger.lifecycle('flightlog: no Android SDK found, skipping :ftc')
+}

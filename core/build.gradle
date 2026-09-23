@@ -1,0 +1,38 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+}
+
+description = 'WPILOG writer and change-only logger. No dependencies.'
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
+// FTC robot code compiles at Java 8; build for 8 so any team can use this.
+tasks.withType(JavaCompile).configureEach {
+    options.release = 8
+    options.encoding = 'UTF-8'
+}
+
+dependencies {
+    testImplementation 'junit:junit:4.13.2'
+}
+
+test {
+    // ParityFilesTest writes tools/logcheck/scenario.tsv with our writer, for
+    // the Python WPILib-parity tests. See tools/logcheck/README.md.
+    systemProperty 'logcheck.scenario', rootProject.file('tools/logcheck/scenario.tsv')
+    systemProperty 'logcheck.out', layout.buildDirectory.dir('logcheck').get().asFile
+    testLogging { events 'passed', 'skipped', 'failed' }
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifactId = 'flightlog-core'
+            from components.java
+        }
+    }
+}

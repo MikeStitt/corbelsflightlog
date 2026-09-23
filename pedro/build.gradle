@@ -1,0 +1,36 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+}
+
+description = 'Pedro Pathing state and debug data into a FlightLog.'
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.release = 8
+    options.encoding = 'UTF-8'
+}
+
+dependencies {
+    api project(':core')
+    // compileOnly: the robot project already brings its own Pedro version, and
+    // this must not force a different one on it.
+    compileOnly "com.pedropathing:core:${pedroVersion}"
+    testImplementation "com.pedropathing:core:${pedroVersion}"
+    testImplementation 'junit:junit:4.13.2'
+}
+
+test { testLogging { events 'passed', 'skipped', 'failed' } }
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifactId = 'flightlog-pedro'
+            from components.java
+        }
+    }
+}

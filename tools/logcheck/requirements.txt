@@ -1,0 +1,5 @@
+# WPILib's own logging and geometry code, as Python packages (robotpy).
+# Pinned to the WPILib release whose Java log reader is vendored in
+# TeamCode/src/test/java/edu/wpi/first/util/datalog/.
+robotpy-wpiutil==2026.2.2
+robotpy-wpimath==2026.2.2

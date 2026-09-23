@@ -1,0 +1,38 @@
+plugins {
+    id 'com.android.library'
+    id 'maven-publish'
+}
+
+description = 'FTC glue: log to the Control Hub, mirror values to Panels.'
+
+android {
+    namespace = 'io.github.spiresfrc9106.flightlog.ftc'
+    compileSdk 34              // Panels pulls Material Components, which needs 34
+
+    defaultConfig {
+        minSdk 24              // the FTC SDK's minimum
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    publishing { singleVariant('release') }
+}
+
+dependencies {
+    api project(':core')
+    // compileOnly: the robot project supplies its own FTC SDK and Panels.
+    compileOnly 'org.firstinspires.ftc:RobotCore:12.0.0'
+    compileOnly "com.bylazar:fullpanels:${panelsVersion}"
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            maven(MavenPublication) {
+                artifactId = 'flightlog-ftc'
+                from components.release
+            }
+        }
+    }
+}

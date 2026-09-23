@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  jvm:
+    name: Build and test (core, pedro)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: temurin
+      - uses: gradle/actions/setup-gradle@v4
+      - run: ./gradlew build --stacktrace
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: '*/build/reports/tests/test'
+      - name: Upload the files the WPILib parity tests compare
+        uses: actions/upload-artifact@v4
+        with:
+          name: logcheck-files
+          path: core/build/logcheck
+
+  wpilib-parity:
+    name: WPILib parity (robotpy)
+    needs: jvm
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: logcheck-files
+          path: core/build/logcheck
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r tools/logcheck/requirements.txt
+      # Compares our files byte-for-byte against WPILib's own native writer.
+      - run: python -m unittest discover -s tools/logcheck -v
+
+  android:
+    name: Build the FTC module
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: temurin
+      # :ftc is an Android library and is only included when an SDK is present.
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+      - run: ./gradlew :ftc:assembleRelease --stacktrace
