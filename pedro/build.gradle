@@ -29,7 +29,7 @@ test { testLogging { events 'passed', 'skipped', 'failed' } }
 publishing {
     publications {
         maven(MavenPublication) {
-            artifactId = 'flightlog-pedro'
+            artifactId = 'corbelsflightlog-pedro'
             from components.java
         }
     }

@@ -31,7 +31,7 @@ test {
 publishing {
     publications {
         maven(MavenPublication) {
-            artifactId = 'flightlog-core'
+            artifactId = 'corbelsflightlog-core'
             from components.java
         }
     }

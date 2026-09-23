@@ -92,7 +92,7 @@ def main():
     newest = next((v for v in versions if v != "dev"), versions[0])
     with open(os.path.join(SITE, "index.html"), "w") as f:
         f.write('<!doctype html><meta http-equiv="refresh" content="0; url=./%s/">'
-                '<a href="./%s/">flightlog documentation</a>\n' % (newest, newest))
+                '<a href="./%s/">corbelsflightlog documentation</a>\n' % (newest, newest))
     print("built %s -> %s (versions: %s)" % (version, out, ", ".join(versions)))
 
 

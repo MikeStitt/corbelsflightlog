@@ -5,8 +5,8 @@
 One file per run. On an FTC robot:
 
 ```java
-import io.github.spiresfrc9106.flightlog.FlightLog;
-import io.github.spiresfrc9106.flightlog.ftc.FtcFlightLog;
+import io.github.mikestitt.corbelsflightlog.FlightLog;
+import io.github.mikestitt.corbelsflightlog.ftc.FtcFlightLog;
 
 private FlightLog log;
 

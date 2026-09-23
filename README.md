@@ -1,4 +1,4 @@
-# flightlog
+# corbelsflightlog
 
 WPILOG logging for FIRST Tech Challenge robots -- the format
 [AdvantageScope](https://docs.advantagescope.org) opens.
@@ -15,9 +15,9 @@ review afterwards -- unlike a dashboard, which samples and forgets.
 
 | Module | Depends on | For |
 |---|---|---|
-| `flightlog-core` | nothing | The WPILOG writer and logger |
-| `flightlog-pedro` | Pedro Pathing | Pose, path, aim point and Pedro's debug data |
-| `flightlog-ftc` | FTC SDK, Panels | The Control Hub's storage; mirroring to Panels |
+| `corbelsflightlog-core` | nothing | The WPILOG writer and logger |
+| `corbelsflightlog-pedro` | Pedro Pathing | Pose, path, aim point and Pedro's debug data |
+| `corbelsflightlog-ftc` | FTC SDK, Panels | The Control Hub's storage; mirroring to Panels |
 
 ## Install
 
@@ -25,9 +25,9 @@ review afterwards -- unlike a dashboard, which samples and forgets.
 repositories { maven { url = "https://jitpack.io" } }
 
 dependencies {
-    implementation 'com.github.spiresfrc9106.flightlog:flightlog-core:v0.1.0'
-    implementation 'com.github.spiresfrc9106.flightlog:flightlog-pedro:v0.1.0'  // optional
-    implementation 'com.github.spiresfrc9106.flightlog:flightlog-ftc:v0.1.0'    // optional
+    implementation 'com.github.MikeStitt.corbelsflightlog:corbelsflightlog-core:v0.1.0'
+    implementation 'com.github.MikeStitt.corbelsflightlog:corbelsflightlog-pedro:v0.1.0'  // optional
+    implementation 'com.github.MikeStitt.corbelsflightlog:corbelsflightlog-ftc:v0.1.0'    // optional
 }
 ```
 
@@ -36,7 +36,7 @@ their versions.
 
 ## Documentation
 
-<https://spiresfrc9106.github.io/flightlog/> -- one copy per release, plus the
+<https://mikestitt.github.io/corbelsflightlog/> -- one copy per release, plus the
 Javadoc.
 
 ## Building

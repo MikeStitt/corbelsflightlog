@@ -1,4 +1,4 @@
-# flightlog
+# corbelsflightlog
 
 WPILOG logging for FIRST Tech Challenge robots — the log format
 [AdvantageScope](https://docs.advantagescope.org) opens.
@@ -17,9 +17,9 @@ FlightLog.event("kicker fired");           // one-off, with its exact time
 
 | Module | Depends on | For |
 |---|---|---|
-| `flightlog-core` | nothing | The WPILOG writer and the logger. Any Java project. |
-| `flightlog-pedro` | Pedro Pathing | The follower's pose, path, aim point and debug data |
-| `flightlog-ftc` | FTC SDK, Panels | Logging to the Control Hub; mirroring values to Panels |
+| `corbelsflightlog-core` | nothing | The WPILOG writer and the logger. Any Java project. |
+| `corbelsflightlog-pedro` | Pedro Pathing | The follower's pose, path, aim point and debug data |
+| `corbelsflightlog-ftc` | FTC SDK, Panels | Logging to the Control Hub; mirroring values to Panels |
 
 ```{toctree}
 :maxdepth: 2
@@ -36,8 +36,8 @@ testing
 
 Javadoc, built by Gradle and published beside these pages with each version:
 
-<a href="javadoc/core/index.html">flightlog-core</a> &middot;
-<a href="javadoc/pedro/index.html">flightlog-pedro</a>
+<a href="javadoc/core/index.html">corbelsflightlog-core</a> &middot;
+<a href="javadoc/pedro/index.html">corbelsflightlog-pedro</a>
 
 (Those links work on the published site; Gradle copies the Javadoc in when the
 site is built, so they are dead in a local `sphinx` build.)

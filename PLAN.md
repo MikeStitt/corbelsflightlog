@@ -1,4 +1,4 @@
-# Plan: splitting flightlog into its own repository
+# Plan: splitting corbelsflightlog into its own repository
 
 ## What this is
 
@@ -10,9 +10,9 @@ documentation. Nothing here depends on the robot repository.
 
 | Module | Artifact | Depends on | Holds |
 |---|---|---|---|
-| `core` | `flightlog-core` | nothing | `WpiLogWriter`, `FlightLog` |
-| `pedro` | `flightlog-pedro` | Pedro Pathing (`compileOnly`) | `PedroFlightLog` |
-| `ftc` | `flightlog-ftc` | FTC SDK + Panels (`compileOnly`) | `FtcFlightLog`, `PanelsMirror` |
+| `core` | `corbelsflightlog-core` | nothing | `WpiLogWriter`, `FlightLog` |
+| `pedro` | `corbelsflightlog-pedro` | Pedro Pathing (`compileOnly`) | `PedroFlightLog` |
+| `ftc` | `corbelsflightlog-ftc` | FTC SDK + Panels (`compileOnly`) | `FtcFlightLog`, `PanelsMirror` |
 
 The split follows the dependencies, so a team takes only what it uses. `core`
 is plain Java and runs anywhere, including desktop tests. Pedro, the FTC SDK
@@ -25,7 +25,7 @@ builds it on a runner that has the SDK.
 
 ## Steps to get it running
 
-1. **Create the repo** `spiresfrc9106/flightlog` on GitHub, public (JitPack
+1. **Create the repo** `MikeStitt/corbelsflightlog` on GitHub, public (JitPack
    only serves public repos) and push this tree to `main`.
 2. **Turn on GitHub Pages**: Settings → Pages → source "Deploy from a branch",
    branch `gh-pages`, folder `/`. The branch appears the first time the docs
@@ -98,8 +98,8 @@ quietly shortening the list.
   works immediately. Maven Central is more robust and is where Pedro publishes;
   moving later means adding signing and a `sonatype` publish step, not
   restructuring.
-- **Group `io.github.spiresfrc9106`.** JitPack serves it as
-  `com.github.spiresfrc9106.flightlog:flightlog-core` regardless; the group in
+- **Group `io.github.mikestitt`.** JitPack serves it as
+  `com.github.MikeStitt.corbelsflightlog:corbelsflightlog-core` regardless; the group in
   `gradle.properties` matters if you later publish to Maven Central.
 - **`PanelsLogger` stays in the robot repo.** Its field drawing is a team
   choice, not library behaviour. `PanelsMirror` here is only the value

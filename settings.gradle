@@ -1,4 +1,4 @@
-rootProject.name = 'flightlog'
+rootProject.name = 'corbelsflightlog'
 
 include ':core'
 include ':pedro'
@@ -13,5 +13,5 @@ def hasAndroidSdk = file('local.properties').exists() ||
 if (hasAndroidSdk) {
     include ':ftc'
 } else {
-    logger.lifecycle('flightlog: no Android SDK found, skipping :ftc')
+    logger.lifecycle('corbelsflightlog: no Android SDK found, skipping :ftc')
 }

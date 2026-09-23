@@ -6,7 +6,7 @@ plugins {
 description = 'FTC glue: log to the Control Hub, mirror values to Panels.'
 
 android {
-    namespace = 'io.github.spiresfrc9106.flightlog.ftc'
+    namespace = 'io.github.mikestitt.corbelsflightlog.ftc'
     compileSdk 34              // Panels pulls Material Components, which needs 34
 
     defaultConfig {
@@ -30,7 +30,7 @@ afterEvaluate {
     publishing {
         publications {
             maven(MavenPublication) {
-                artifactId = 'flightlog-ftc'
+                artifactId = 'corbelsflightlog-ftc'
                 from components.release
             }
         }

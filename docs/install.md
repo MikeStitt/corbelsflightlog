@@ -10,11 +10,11 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.spiresfrc9106.flightlog:flightlog-core:v0.1.0'
+    implementation 'com.github.MikeStitt.corbelsflightlog:corbelsflightlog-core:v0.1.0'
     // optional, if you use Pedro Pathing:
-    implementation 'com.github.spiresfrc9106.flightlog:flightlog-pedro:v0.1.0'
+    implementation 'com.github.MikeStitt.corbelsflightlog:corbelsflightlog-pedro:v0.1.0'
     // optional, for the Control Hub and Panels glue:
-    implementation 'com.github.spiresfrc9106.flightlog:flightlog-ftc:v0.1.0'
+    implementation 'com.github.MikeStitt.corbelsflightlog:corbelsflightlog-ftc:v0.1.0'
 }
 ```
 
@@ -23,7 +23,7 @@ of a new version is slow. After that it's cached.
 
 ## Versions
 
-`flightlog-core` needs nothing. `flightlog-pedro` and `flightlog-ftc` declare
+`corbelsflightlog-core` needs nothing. `corbelsflightlog-pedro` and `corbelsflightlog-ftc` declare
 Pedro Pathing, the FTC SDK and Panels as `compileOnly`, so **your project
 chooses those versions** and this library can't force a different one on you.
 

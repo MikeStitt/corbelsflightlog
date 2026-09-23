@@ -1,9 +1,9 @@
 # Pedro Pathing
 
-`flightlog-pedro` logs two things, either or both.
+`corbelsflightlog-pedro` logs two things, either or both.
 
 ```java
-import io.github.spiresfrc9106.flightlog.pedro.PedroFlightLog;
+import io.github.mikestitt.corbelsflightlog.pedro.PedroFlightLog;
 
 PedroFlightLog pedro = new PedroFlightLog(log);
 follower = Constants.create(hardwareMap).withLogger(pedro::record);   // debug data
