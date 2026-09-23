@@ -1,0 +1,49 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+}
+
+description = 'WPILib geometry types into a FlightLog.'
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.release = 8
+    options.encoding = 'UTF-8'
+}
+
+dependencies {
+    api project(':core')
+    // compileOnly: a team that already uses WPILib geometry brings its own
+    // version; this must not force a different one on it. A team that doesn't
+    // use WPILib geometry has no reason to add this module at all.
+    compileOnly "edu.wpi.first.wpimath:wpimath-java:${wpimathVersion}"
+    // The geometry classes implement interfaces from wpiutil; compileOnly is
+    // not transitive, so it has to be named here too.
+    compileOnly "edu.wpi.first.wpiutil:wpiutil-java:${wpimathVersion}"
+    // The geometry constructors have unit-typed overloads, so javac needs the
+    // unit classes even when we only pass doubles.
+    compileOnly "edu.wpi.first.wpiunits:wpiunits-java:${wpimathVersion}"
+    testImplementation "edu.wpi.first.wpimath:wpimath-java:${wpimathVersion}"
+    testImplementation "edu.wpi.first.wpiutil:wpiutil-java:${wpimathVersion}"
+    testImplementation "edu.wpi.first.wpiunits:wpiunits-java:${wpimathVersion}"
+    // Constructing any geometry value runs a static initializer that builds its
+    // protobuf descriptor, which needs quickbuf at runtime. WPILib's published
+    // POMs don't carry their own dependencies, so name it here.
+    testRuntimeOnly 'us.hebi.quickbuf:quickbuf-runtime:1.4'   // what wpimath 2026.2.2 itself uses
+    testImplementation 'junit:junit:4.13.2'
+}
+
+test { testLogging { events 'passed', 'skipped', 'failed' } }
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifactId = 'corbelsflightlog-wpilib'
+            from components.java
+        }
+    }
+}

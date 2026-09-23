@@ -97,6 +97,23 @@ public final class WpiLogWriter implements Closeable {
         for (long v : values) writeLittle(v, 8);
     }
 
+    /** {@code string[]}: a 4-byte count, then each string as a 4-byte length
+     *  and its UTF-8 bytes. */
+    public void appendStringArray(int id, String[] values, long timestampUs) throws IOException {
+        byte[][] utf8 = new byte[values.length][];
+        int size = 4;
+        for (int i = 0; i < values.length; i++) {
+            utf8[i] = utf8(values[i]);
+            size += 4 + utf8[i].length;
+        }
+        recordHeader(id, size, timestampUs);
+        writeLittle(values.length, 4);
+        for (byte[] b : utf8) {
+            writeLittle(b.length, 4);
+            out.write(b);
+        }
+    }
+
     public void appendBooleanArray(int id, boolean[] values, long timestampUs) throws IOException {
         recordHeader(id, values.length, timestampUs);
         for (boolean v : values) out.write(v ? 1 : 0);

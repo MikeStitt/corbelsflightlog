@@ -33,23 +33,23 @@ public final class PanelsMirror {
 
     public void data(String key, double value) {
         panels.addData(key, value);
-        log.number(key, value);
+        log.recordOutput(key, value);
     }
 
     /** Also takes {@code int}: whole numbers are stored as int64. */
     public void data(String key, long value) {
         panels.addData(key, value);
-        log.integer(key, value);
+        log.recordOutput(key, value);
     }
 
     public void data(String key, boolean value) {
         panels.addData(key, value);
-        log.bool(key, value);
+        log.recordOutput(key, value);
     }
 
     public void data(String key, String value) {
         panels.addData(key, String.valueOf(value));
-        log.text(key, value);
+        log.recordOutput(key, value);
     }
 
     public void data(String key, Enum<?> value) {

@@ -1,33 +1,118 @@
 package io.github.mikestitt.corbelsflightlog.ftc;
 
+import android.content.Context;
+
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpModeManagerImpl;
+import com.qualcomm.robotcore.eventloop.opmode.OpModeManagerNotifier;
+import com.qualcomm.robotcore.util.RobotLog;
+import com.qualcomm.robotcore.util.WebHandlerManager;
 
 import io.github.mikestitt.corbelsflightlog.FlightLog;
+
+import org.firstinspires.ftc.ftccommon.external.WebHandlerRegistrar;
+import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 
 import java.io.File;
 
 /**
- * FlightLog for an FTC robot: files land where the Control Hub keeps them, and
- * are named after the OpMode.
+ * FlightLog for an FTC robot: files land in the Robot Controller's own storage,
+ * are named after the OpMode, and are closed when the OpMode stops -- whether
+ * or not your code remembers to.
  *
  * <pre>
  * private FlightLog log;
  *
  * public void start() { log = FtcFlightLog.open(this); }
- * public void loop()  { log.number("shooter/rpm", rpm); log.endLoop(); }
- * public void stop()  { log.close(); }
+ * public void loop()  { log.recordOutput("shooter/rpm", rpm); log.endLoop(); }
+ * public void stop()  { log.close(); }   // optional: see below
  * </pre>
  *
- * <p>Files go to {@code /sdcard/FIRST/logs} on the Control Hub. Pull them with
- * Android Studio's Device Explorer or {@code adb pull}, then open them in
- * AdvantageScope.
+ * <p><b>Closing.</b> This registers with the Robot Controller and closes the
+ * open log when an OpMode stops, and again before the next one initialises. So
+ * a log survives an OpMode that throws, or that never calls {@code close()}.
+ * Calling {@code close()} yourself still works and is still worth doing: it
+ * flushes immediately rather than at the end of the OpMode.
+ *
+ * <p><b>Where the files go.</b> {@link #logDirectory()} is a {@code logs}
+ * folder inside the Robot Controller's own FIRST folder -- the SDK's
+ * {@code AppUtil.ROOT_FOLDER}, which is internal storage on a Control Hub, not
+ * a removable card. If that folder can't be used, this falls back to the app's
+ * private files directory, which always exists.
+ *
+ * <p><b>Getting them off the robot.</b> With the laptop on the robot's Wi-Fi,
+ * open <a href="http://192.168.43.1:8080/corbelsflightlog">
+ * 192.168.43.1:8080/corbelsflightlog</a> and click a file. {@code adb pull}
+ * still works too.
  */
-public final class FtcFlightLog {
+public final class FtcFlightLog implements OpModeManagerNotifier.Notifications {
 
-    /** Where the Robot Controller keeps its files. */
-    public static final File LOG_DIRECTORY = new File("/sdcard/FIRST/logs");
+    /** The single instance registered with the Robot Controller. */
+    private static final FtcFlightLog INSTANCE = new FtcFlightLog();
+
+    /** The log this class opened and may close. */
+    private static FlightLog current;
 
     private FtcFlightLog() {
+    }
+
+    /** Set by {@link #useDirectory}; overrides the usual choice when set. */
+    private static volatile File override;
+
+    /**
+     * Log somewhere else -- a USB stick, or a temp folder in a test. Pass null
+     * to go back to the usual choice.
+     */
+    public static void useDirectory(File folder) {
+        override = folder;
+    }
+
+    /**
+     * Where log files go: {@code <FIRST>/logs} when that is usable, otherwise
+     * the app's own files directory. Never returns null, never throws.
+     */
+    public static File logDirectory() {
+        File chosen = override;
+        if (usable(chosen)) return chosen;
+
+        File first = null;
+        File appFiles = null;
+        try {
+            first = AppUtil.ROOT_FOLDER;
+        } catch (Throwable ignored) {
+            // no app: a unit test, or an SDK that moved it
+        }
+        try {
+            Context context = AppUtil.getDefContext();
+            if (context != null) appFiles = context.getFilesDir();
+        } catch (Throwable ignored) {
+            // no app context either
+        }
+        return chooseDirectory(first, appFiles);
+    }
+
+    /**
+     * Picks the log folder given the Robot Controller's FIRST folder and the
+     * app's own files folder, either of which may be null or unusable. Split
+     * out from {@link #logDirectory} so it can be tested off a robot.
+     */
+    static File chooseDirectory(File firstFolder, File appFilesFolder) {
+        File preferred = firstFolder == null ? null : new File(firstFolder, "logs");
+        if (usable(preferred)) return preferred;
+        File fallback = appFilesFolder == null ? null : new File(appFilesFolder, "logs");
+        if (usable(fallback)) return fallback;
+        return preferred != null ? preferred : new File("logs");
+    }
+
+    /** True if the folder exists or can be created, and can be written to. */
+    static boolean usable(File folder) {
+        if (folder == null) return false;
+        try {
+            if (!folder.isDirectory() && !folder.mkdirs()) return false;
+            return folder.canWrite();
+        } catch (Throwable t) {
+            return false;
+        }
     }
 
     /** Opens a log named after the OpMode's class. Never throws. */
@@ -35,9 +120,64 @@ public final class FtcFlightLog {
         return open(opMode == null ? "OpMode" : opMode.getClass().getSimpleName());
     }
 
-    /** Opens a log with the given run name, in {@link #LOG_DIRECTORY}. */
-    public static FlightLog open(String runName) {
-        FlightLog.directory = LOG_DIRECTORY;
-        return FlightLog.open(runName);
+    /** Opens a log with the given run name, in {@link #logDirectory()}. */
+    public static synchronized FlightLog open(String runName) {
+        closeCurrent();
+        FlightLog.directory = logDirectory();
+        current = FlightLog.open(runName);
+        return current;
+    }
+
+    /** The listener the Robot Controller calls. Package-private for tests. */
+    static OpModeManagerNotifier.Notifications listener() {
+        return INSTANCE;
+    }
+
+    /** Closes the log this class opened, if it is still open. */
+    public static synchronized void closeCurrent() {
+        if (current != null) {
+            current.close();
+            current = null;
+        }
+    }
+
+    // ------------------------------------------------------------ robot hooks
+
+    /**
+     * Called by the Robot Controller as it starts. Registers the OpMode
+     * listener that closes logs, and the pages that serve them.
+     */
+    @WebHandlerRegistrar
+    public static void register(Context context, WebHandlerManager manager) {
+        try {
+            OpModeManagerImpl opModeManager =
+                    OpModeManagerImpl.getOpModeManagerOfActivity(AppUtil.getInstance().getActivity());
+            if (opModeManager != null) {
+                opModeManager.unregisterListener(INSTANCE);
+                opModeManager.registerListener(INSTANCE);
+            }
+            LogWebHandlers.register(manager);
+            RobotLog.ii("corbelsflightlog", "logs at http://192.168.43.1:8080"
+                    + LogWebHandlers.INDEX_PATH + ", files in " + logDirectory());
+        } catch (Throwable t) {
+            // A logger must never stop the Robot Controller from starting.
+            RobotLog.ee("corbelsflightlog", t, "could not register");
+        }
+    }
+
+    /** Closes a log left open by an OpMode that was force-stopped. */
+    @Override
+    public void onOpModePreInit(OpMode opMode) {
+        closeCurrent();
+    }
+
+    @Override
+    public void onOpModePreStart(OpMode opMode) {
+    }
+
+    /** Closes the log when the OpMode ends, however it ended. */
+    @Override
+    public void onOpModePostStop(OpMode opMode) {
+        closeCurrent();
     }
 }

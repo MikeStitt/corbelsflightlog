@@ -17,6 +17,7 @@ rootProject.name = 'corbelsflightlog'
 
 include ':core'
 include ':pedro'
+include ':wpilib'
 
 // The FTC module is an Android library: it needs the Android SDK and the FTC
 // SDK, which a plain JVM build doesn't have. Include it only when an Android

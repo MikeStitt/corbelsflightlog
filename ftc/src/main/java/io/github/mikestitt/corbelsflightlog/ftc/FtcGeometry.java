@@ -34,7 +34,7 @@ public final class FtcGeometry {
     }
 
     /** An AprilTag or other SDK pose, as a WPILib {@code Pose3d} in metres. */
-    public static void pose3d(FlightLog log, String key, Pose3D pose) {
+    public static void recordOutput(FlightLog log, String key, Pose3D pose) {
         if (log == null || pose == null) return;
         Position p = pose.getPosition();
         YawPitchRollAngles o = pose.getOrientation();
@@ -44,8 +44,9 @@ public final class FtcGeometry {
         log.pose3d(key, metres.x, metres.y, metres.z, q[0], q[1], q[2], q[3]);
     }
 
-    /** An orientation on its own, as a WPILib {@code Rotation3d}. */
-    public static void rotation3d(FlightLog log, String key, YawPitchRollAngles angles) {
+    /** An orientation on its own, as a WPILib {@code Rotation3d}. For just the
+     *  heading, use {@link #heading}. */
+    public static void recordOutput(FlightLog log, String key, YawPitchRollAngles angles) {
         if (log == null || angles == null) return;
         double[] q = quaternion(angles);
         log.rotation3d(key, q[0], q[1], q[2], q[3]);

@@ -83,6 +83,8 @@ def write_with_wpilib(path):
                 log.appendDoubleArray(i, [float(x) for x in items(v)], ts)
             elif t == "int64[]":
                 log.appendIntegerArray(i, [int(x) for x in items(v)], ts)
+            elif t == "string[]":
+                log.appendStringArray(i, items(v), ts)
             elif t == "boolean[]":
                 log.appendBooleanArray(i, [parse_bool(x) for x in items(v)], ts)
             else:

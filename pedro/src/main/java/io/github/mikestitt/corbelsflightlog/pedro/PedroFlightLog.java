@@ -33,6 +33,27 @@ import java.util.Map;
  */
 public final class PedroFlightLog {
 
+    /**
+     * Pedro's own pose, as a WPILib {@code Pose2d}: inches and a corner origin
+     * converted to metres and the field frame AdvantageScope draws.
+     */
+    public static void recordOutput(FlightLog log, String key, Pose pose) {
+        if (log == null || pose == null) return;
+        log.pose(key, pose.x(), pose.y(), pose.heading());
+    }
+
+    /** Pedro's body-frame speeds, as a WPILib {@code Twist2d} in metres. */
+    public static void recordOutput(FlightLog log, String key, Twist twist) {
+        if (log == null || twist == null) return;
+        log.twist2d(key, twist.vx * METRES_PER_INCH, twist.vy * METRES_PER_INCH, twist.omega);
+    }
+
+    /** Pedro's world-frame speeds, as a WPILib {@code ChassisSpeeds} in metres. */
+    public static void recordOutput(FlightLog log, String key, Velocity velocity) {
+        if (log == null || velocity == null) return;
+        log.chassisSpeeds(key, velocity.vx * METRES_PER_INCH, velocity.vy * METRES_PER_INCH, velocity.omega);
+    }
+
     /** Pedro works in inches; WPILib structs are metres. */
     private static final double METRES_PER_INCH = 0.0254;
 
@@ -64,7 +85,7 @@ public final class PedroFlightLog {
         if (follower == null) return;
         Pose pose = follower.pose();
         log.pose(prefix + "/Pose", pose.x(), pose.y(), pose.heading());
-        log.text(prefix + "/Mode", String.valueOf(follower.mode()));
+        log.recordOutput(prefix + "/Mode", String.valueOf(follower.mode()));
 
         boolean aiming = follower.mode() == Follower.Mode.FOLLOW || follower.mode() == Follower.Mode.HOLD;
         if (aiming && follower.closestPose() != null) {
@@ -73,16 +94,16 @@ public final class PedroFlightLog {
         }
 
         Velocity v = follower.velocity();
-        log.number(prefix + "/vel/vx_ips", v.vx);
-        log.number(prefix + "/vel/vy_ips", v.vy);
-        log.number(prefix + "/vel/omega_radps", v.omega);
+        log.recordOutput(prefix + "/vel/vx_ips", v.vx);
+        log.recordOutput(prefix + "/vel/vy_ips", v.vy);
+        log.recordOutput(prefix + "/vel/omega_radps", v.omega);
         // The same speeds as WPILib structs, in metres: AdvantageScope shows
         // ChassisSpeeds and Twist2d as one value each rather than six numbers.
         log.chassisSpeeds(prefix + "/Speeds", v.vx * METRES_PER_INCH, v.vy * METRES_PER_INCH, v.omega);
 
         Twist t = follower.twist();
-        log.number(prefix + "/vel/forward_ips", t.vx);
-        log.number(prefix + "/vel/strafe_ips", t.vy);
+        log.recordOutput(prefix + "/vel/forward_ips", t.vx);
+        log.recordOutput(prefix + "/vel/strafe_ips", t.vy);
         log.twist2d(prefix + "/Twist", t.vx * METRES_PER_INCH, t.vy * METRES_PER_INCH, t.omega);
         // Why the guard rather than calling tangentialVelocity() directly:
         // Observed 2026-09-22 against Pedro Pathing 3.0.1, in a
@@ -92,7 +113,7 @@ public final class PedroFlightLog {
         // Vector2D.dot, and follower.closestTangent() was null at the time.
         // Logging NaN keeps the call out of that state; FlightLog skips
         // non-finite values, so the channel simply has a gap.
-        log.number(prefix + "/vel/tangential_ips",
+        log.recordOutput(prefix + "/vel/tangential_ips",
                 aiming && follower.closestTangent() != null ? follower.tangentialVelocity() : Double.NaN);
 
         recordPath(follower);
@@ -170,18 +191,18 @@ public final class PedroFlightLog {
             if (v == null) continue;
             Keys k = keys(map, e.getKey());
             if (v instanceof Double || v instanceof Float) {
-                log.number(k.base, ((Number) v).doubleValue());
+                log.recordOutput(k.base, ((Number) v).doubleValue());
             } else if (v instanceof Number) {                 // Integer, Long, Short, Byte
-                log.integer(k.base, ((Number) v).longValue());
+                log.recordOutput(k.base, ((Number) v).longValue());
             } else if (v instanceof Boolean) {
-                log.bool(k.base, (Boolean) v);
+                log.recordOutput(k.base, (Boolean) v);
             } else if (v instanceof Pose) {
                 Pose p = (Pose) v;
                 log.pose(k.base, p.x(), p.y(), p.heading());
             } else if (v instanceof Vector2D) {
                 Vector2D vec = (Vector2D) v;
-                log.number(k.x, vec.x());
-                log.number(k.y, vec.y());
+                log.recordOutput(k.x, vec.x());
+                log.recordOutput(k.y, vec.y());
             } else if (v instanceof Velocity) {
                 Velocity vel = (Velocity) v;
                 three(k, vel.vx, vel.vy, vel.omega);
@@ -189,15 +210,15 @@ public final class PedroFlightLog {
                 Twist t = (Twist) v;
                 three(k, t.vx, t.vy, t.omega);
             } else {
-                log.text(k.base, v instanceof Enum ? ((Enum<?>) v).name() : String.valueOf(v));
+                log.recordOutput(k.base, v instanceof Enum ? ((Enum<?>) v).name() : String.valueOf(v));
             }
         }
     }
 
     private void three(Keys k, double vx, double vy, double omega) {
-        log.number(k.vx, vx);
-        log.number(k.vy, vy);
-        log.number(k.omega, omega);
+        log.recordOutput(k.vx, vx);
+        log.recordOutput(k.vy, vy);
+        log.recordOutput(k.omega, omega);
     }
 
     /** Channel names, built once per entry so the loop allocates none. */

@@ -78,7 +78,9 @@ public class ParityFilesTest {
     }
 
     private static String[] items(String field) {
-        return field.isEmpty() ? new String[0] : field.split(",");
+        // -1 keeps trailing empty items, which is what Python's split does --
+        // the two parsers have to agree or the files differ for the wrong reason.
+        return field.isEmpty() ? new String[0] : field.split(",", -1);
     }
 
     private static byte[] hex(String s) {
@@ -111,6 +113,10 @@ public class ParityFilesTest {
                 long[] a = new long[s.length];
                 for (int i = 0; i < s.length; i++) a[i] = Long.parseLong(s[i]);
                 w.appendInt64Array(id, a, ts);
+                break;
+            }
+            case "string[]": {
+                w.appendStringArray(id, items(v), ts);
                 break;
             }
             case "boolean[]": {

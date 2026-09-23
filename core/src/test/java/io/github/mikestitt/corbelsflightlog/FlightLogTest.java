@@ -227,17 +227,17 @@ public class FlightLogTest {
     @Test
     public void aDisabledLogAcceptsEveryCallAndRecordsNothing() {
         FlightLog log = FlightLog.disabled("test");
-        log.number("d", 1.0);
-        log.float32("f", 1.0f);
-        log.integer("i", 1);
-        log.bool("b", true);
-        log.text("s", "x");
+        log.recordOutput("d", 1.0);
+        log.recordOutput("f", 1.0f);
+        log.recordOutput("i", 1);
+        log.recordOutput("b", true);
+        log.recordOutput("s", "x");
         log.pose("p", 1, 2, 3);
         log.poses("pp", new double[]{1, 2, 3});
-        log.numbers("da", new double[]{1});
-        log.integers("ia", new long[]{1});
-        log.integers("ja", new int[]{1});
-        log.bools("ba", new boolean[]{true});
+        log.recordOutput("da", new double[]{1});
+        log.recordOutput("ia", new long[]{1});
+        log.recordOutput("ja", new int[]{1});
+        log.recordOutput("ba", new boolean[]{true});
         log.endLoop();
         log.close();
         assertFalse(log.isRecording());
@@ -250,9 +250,9 @@ public class FlightLogTest {
     public void timestampsAreMicrosecondsSinceOpenFromTheClock() throws IOException {
         RecordedLog log = record(l -> {
             clock.advanceMicros(250);
-            l.number("a", 1.0);
+            l.recordOutput("a", 1.0);
             clock.advanceMillis(2);
-            l.number("a", 2.0);
+            l.recordOutput("a", 2.0);
         });
         assertEquals(Arrays.asList(250L, 2_250L), log.timestamps("/a"));
         assertEquals("entry started when first used", 250, log.entry("/a").startTimestamp);
@@ -263,8 +263,8 @@ public class FlightLogTest {
     @Test
     public void doublesAreWrittenOnlyWhenTheyChange() throws IOException {
         RecordedLog log = record(l -> {
-            for (int i = 0; i < 100; i++) l.number("const", 5.0);
-            for (double v : new double[]{1, 1, 2, 2, 1}) l.number("steps", v);
+            for (int i = 0; i < 100; i++) l.recordOutput("const", 5.0);
+            for (double v : new double[]{1, 1, 2, 2, 1}) l.recordOutput("steps", v);
         });
         assertEquals(1, log.count("/const"));
         assertEquals(Arrays.asList(1.0, 2.0, 1.0), log.doubles("/steps"));
@@ -274,13 +274,13 @@ public class FlightLogTest {
     @Test
     public void nonFiniteDoublesAreSkippedAndMinusZeroEqualsZero() throws IOException {
         RecordedLog log = record(l -> {
-            l.number("d", Double.NaN);
-            l.number("d", Double.POSITIVE_INFINITY);
-            l.number("d", Double.NEGATIVE_INFINITY);
-            l.number("d", 0.0);
-            l.number("d", -0.0);
-            l.number("d", Double.NaN);
-            l.number("d", 3.0);
+            l.recordOutput("d", Double.NaN);
+            l.recordOutput("d", Double.POSITIVE_INFINITY);
+            l.recordOutput("d", Double.NEGATIVE_INFINITY);
+            l.recordOutput("d", 0.0);
+            l.recordOutput("d", -0.0);
+            l.recordOutput("d", Double.NaN);
+            l.recordOutput("d", 3.0);
         });
         List<Double> got = log.doubles("/d");
         assertEquals(Arrays.asList(0.0, 3.0), got);
@@ -291,14 +291,14 @@ public class FlightLogTest {
     @Test
     public void floatsAreStoredAsFloatsOnlyWhenChanged() throws IOException {
         RecordedLog log = record(l -> {
-            l.float32("f", 0.1f);
-            l.float32("f", 0.1f);
-            l.float32("f", -0.0f);
-            l.float32("f", 0.0f);
-            l.float32("f", Float.NaN);
-            l.float32("f", Float.POSITIVE_INFINITY);
-            l.float32("f", Float.NEGATIVE_INFINITY);
-            l.float32("f", 2.5f);
+            l.recordOutput("f", 0.1f);
+            l.recordOutput("f", 0.1f);
+            l.recordOutput("f", -0.0f);
+            l.recordOutput("f", 0.0f);
+            l.recordOutput("f", Float.NaN);
+            l.recordOutput("f", Float.POSITIVE_INFINITY);
+            l.recordOutput("f", Float.NEGATIVE_INFINITY);
+            l.recordOutput("f", 2.5f);
         });
         RecordedLog.Entry e = log.entry("/f");
         assertEquals("float", e.type);
@@ -311,11 +311,11 @@ public class FlightLogTest {
     @Test
     public void integersAreInt64OnlyWhenChanged() throws IOException {
         RecordedLog log = record(l -> {
-            l.integer("i", 7);
-            l.integer("i", 7);
-            l.integer("i", Long.MIN_VALUE);
-            l.integer("i", Long.MAX_VALUE);
-            l.integer("i", Long.MAX_VALUE);
+            l.recordOutput("i", 7);
+            l.recordOutput("i", 7);
+            l.recordOutput("i", Long.MIN_VALUE);
+            l.recordOutput("i", Long.MAX_VALUE);
+            l.recordOutput("i", Long.MAX_VALUE);
         });
         RecordedLog.Entry e = log.entry("/i");
         assertEquals("int64", e.type);
@@ -326,7 +326,7 @@ public class FlightLogTest {
     @Test
     public void booleansAreWrittenOnEachFlip() throws IOException {
         RecordedLog log = record(l -> {
-            for (boolean b : new boolean[]{false, false, true, true, true, false}) l.bool("b", b);
+            for (boolean b : new boolean[]{false, false, true, true, true, false}) l.recordOutput("b", b);
         });
         RecordedLog.Entry e = log.entry("/b");
         assertEquals("boolean", e.type);
@@ -339,12 +339,12 @@ public class FlightLogTest {
     @Test
     public void textIsWrittenOnlyWhenChangedAndNullBecomesTheWordNull() throws IOException {
         RecordedLog log = record(l -> {
-            l.text("s", "INTAKING");
-            l.text("s", "INTAKING");
-            l.text("s", "SHOOTING");
-            l.text("s", null);
-            l.text("s", null);
-            l.text("s", "null");
+            l.recordOutput("s", "INTAKING");
+            l.recordOutput("s", "INTAKING");
+            l.recordOutput("s", "SHOOTING");
+            l.recordOutput("s", (String) null);
+            l.recordOutput("s", (String) null);
+            l.recordOutput("s", "null");
         });
         assertEquals(Arrays.asList("INTAKING", "SHOOTING", "null"), log.strings("/s"));
         assertEquals("string", log.entry("/s").type);
@@ -473,12 +473,12 @@ public class FlightLogTest {
     public void doubleArraysAreWrittenOnlyWhenChangedAndCopied() throws IOException {
         double[] powers = {0.5, 0.5, -0.5, -0.5};
         RecordedLog log = record(l -> {
-            l.numbers("m", powers);
-            l.numbers("m", powers);
+            l.recordOutput("m", powers);
+            l.recordOutput("m", powers);
             powers[0] = 1.0;
-            l.numbers("m", powers);
-            l.numbers("m", new double[]{1.0});             // length change
-            l.numbers("m", new double[0]);
+            l.recordOutput("m", powers);
+            l.recordOutput("m", new double[]{1.0});             // length change
+            l.recordOutput("m", new double[0]);
         });
         RecordedLog.Entry e = log.entry("/m");
         assertEquals("double[]", e.type);
@@ -491,10 +491,10 @@ public class FlightLogTest {
     public void longArraysAreWrittenOnlyWhenChangedAndCopied() throws IOException {
         long[] ticks = {100, -200};
         RecordedLog log = record(l -> {
-            l.integers("t", ticks);
-            l.integers("t", ticks);
+            l.recordOutput("t", ticks);
+            l.recordOutput("t", ticks);
             ticks[1] = -201;
-            l.integers("t", ticks);
+            l.recordOutput("t", ticks);
         });
         RecordedLog.Entry e = log.entry("/t");
         assertEquals("int64[]", e.type);
@@ -506,11 +506,11 @@ public class FlightLogTest {
     public void intArraysAreWidenedToInt64AndCompareElementByElement() throws IOException {
         int[] ticks = {Integer.MIN_VALUE, 0, Integer.MAX_VALUE};
         RecordedLog log = record(l -> {
-            l.integers("t", ticks);
-            l.integers("t", ticks.clone());                   // same values, new array
-            l.integers("t", new int[]{Integer.MIN_VALUE, 1, Integer.MAX_VALUE});  // same length, changed
-            l.integers("t", new int[]{1});                    // length change
-            l.integers("t", new long[]{1});                   // long[] with equal values: same channel, no write
+            l.recordOutput("t", ticks);
+            l.recordOutput("t", ticks.clone());                   // same values, new array
+            l.recordOutput("t", new int[]{Integer.MIN_VALUE, 1, Integer.MAX_VALUE});  // same length, changed
+            l.recordOutput("t", new int[]{1});                    // length change
+            l.recordOutput("t", new long[]{1});                   // long[] with equal values: same channel, no write
         });
         RecordedLog.Entry e = log.entry("/t");
         assertEquals("int64[]", e.type);
@@ -522,9 +522,9 @@ public class FlightLogTest {
     @Test
     public void intArrayAfterLongArrayComparesAgainstTheWidenedCopy() throws IOException {
         RecordedLog log = record(l -> {
-            l.integers("t", new long[]{5, 6});
-            l.integers("t", new int[]{5, 6});                 // equal: no write
-            l.integers("t", new int[]{5, 7});                 // changed
+            l.recordOutput("t", new long[]{5, 6});
+            l.recordOutput("t", new int[]{5, 6});                 // equal: no write
+            l.recordOutput("t", new int[]{5, 7});                 // changed
         });
         assertEquals(2, log.count("/t"));
     }
@@ -533,10 +533,10 @@ public class FlightLogTest {
     public void booleanArraysAreWrittenOnlyWhenChangedAndCopied() throws IOException {
         boolean[] slots = {true, false, false};
         RecordedLog log = record(l -> {
-            l.bools("s", slots);
-            l.bools("s", slots);
+            l.recordOutput("s", slots);
+            l.recordOutput("s", slots);
             slots[2] = true;
-            l.bools("s", slots);
+            l.recordOutput("s", slots);
         });
         RecordedLog.Entry e = log.entry("/s");
         assertEquals("boolean[]", e.type);
@@ -549,18 +549,18 @@ public class FlightLogTest {
     @Test
     public void aKeyKeepsItsFirstTypeAndWarnsOnceInEvents() throws IOException {
         RecordedLog log = record(l -> {
-            l.integer("k", 5);
-            l.number("k", 1.5);           // refused
-            l.text("k", "x");             // refused, no second warning
-            l.bool("k", true);
-            l.float32("k", 2.5f);
+            l.recordOutput("k", 5);
+            l.recordOutput("k", 1.5);           // refused
+            l.recordOutput("k", "x");             // refused, no second warning
+            l.recordOutput("k", true);
+            l.recordOutput("k", 2.5f);
             l.pose("k", 1, 2, 3);
             l.poses("k", new double[]{1, 2, 3});
-            l.numbers("k", new double[]{1});
-            l.integers("k", new long[]{1});
-            l.integers("k", new int[]{1});
-            l.bools("k", new boolean[]{true});
-            l.integer("k", 6);            // same type: accepted
+            l.recordOutput("k", new double[]{1});
+            l.recordOutput("k", new long[]{1});
+            l.recordOutput("k", new int[]{1});
+            l.recordOutput("k", new boolean[]{true});
+            l.recordOutput("k", 6);            // same type: accepted
         });
         RecordedLog.Entry e = log.entry("/k");
         assertEquals("int64", e.type);
@@ -574,17 +574,17 @@ public class FlightLogTest {
     @Test
     public void everyMethodRefusesAKeyOwnedByAnotherType() throws IOException {
         RecordedLog log = record(l -> {
-            l.number("d", 1.0);               // "d" is a double; every other type is refused
-            l.float32("d", 1f);
-            l.integer("d", 1);
-            l.bool("d", true);
-            l.text("d", "x");
+            l.recordOutput("d", 1.0);               // "d" is a double; every other type is refused
+            l.recordOutput("d", 1f);
+            l.recordOutput("d", 1);
+            l.recordOutput("d", true);
+            l.recordOutput("d", "x");
             l.pose("d", 1, 2, 3);
             l.poses("d", new double[]{1, 2, 3});
-            l.numbers("d", new double[]{1});
-            l.integers("d", new long[]{1});
-            l.integers("d", new int[]{1});
-            l.bools("d", new boolean[]{true});
+            l.recordOutput("d", new double[]{1});
+            l.recordOutput("d", new long[]{1});
+            l.recordOutput("d", new int[]{1});
+            l.recordOutput("d", new boolean[]{true});
         });
         assertEquals("double", log.entry("/d").type);
         assertEquals(1, log.count("/d"));
@@ -594,7 +594,7 @@ public class FlightLogTest {
     @Test
     public void misusingTheEventsKeyDoesNotRecurse() throws IOException {
         RecordedLog log = record(l -> {
-            l.number("Events", 1.0);            // student claims "Events" as a number
+            l.recordOutput("Events", 1.0);            // student claims "Events" as a number
             FlightLog.event("dropped");         // events now can't be written
             FlightLog.event("dropped again");
         });
@@ -693,17 +693,17 @@ public class FlightLogTest {
     private static void write(FlightLog log, String kind, int round) {
         double v = round + 1;
         switch (kind) {
-            case "number": log.number("k", v); break;
-            case "float32": log.float32("k", (float) v); break;
-            case "integer": log.integer("k", round + 1); break;
-            case "bool": log.bool("k", round % 2 == 0); break;
-            case "text": log.text("k", "v" + round); break;
+            case "number": log.recordOutput("k", v); break;
+            case "float32": log.recordOutput("k", (float) v); break;
+            case "integer": log.recordOutput("k", round + 1); break;
+            case "bool": log.recordOutput("k", round % 2 == 0); break;
+            case "text": log.recordOutput("k", "v" + round); break;
             case "pose": log.pose("k", v, v, v); break;
             case "poses": log.poses("k", new double[]{v, v, v}); break;
-            case "numbers": log.numbers("k", new double[]{v}); break;
-            case "integers": log.integers("k", new long[]{round + 1}); break;
-            case "ints": log.integers("k", new int[]{round + 1}); break;
-            case "bools": log.bools("k", new boolean[]{round % 2 == 0}); break;
+            case "numbers": log.recordOutput("k", new double[]{v}); break;
+            case "integers": log.recordOutput("k", new long[]{round + 1}); break;
+            case "ints": log.recordOutput("k", new int[]{round + 1}); break;
+            case "bools": log.recordOutput("k", new boolean[]{round % 2 == 0}); break;
             default: FlightLog.event("e" + round); break;
         }
     }
@@ -755,7 +755,7 @@ public class FlightLogTest {
     public void aFailureWhileClosingAfterAWriteFailureIsSwallowed() throws Exception {
         FlightLog log = FlightLog.open("CloseAfterFail");
         breakStorage(log, 0).failClose = true;
-        log.number("k", 1.0);                       // write fails, then close fails too
+        log.recordOutput("k", 1.0);                       // write fails, then close fails too
         assertDisabledByWriteFailure(log);
     }
 
@@ -763,7 +763,7 @@ public class FlightLogTest {
     public void eventsAfterTheCurrentLogFailedAreIgnored() throws Exception {
         FlightLog log = FlightLog.open("FailedCurrent");
         breakStorage(log, 0);
-        log.number("k", 1.0);
+        log.recordOutput("k", 1.0);
         assertDisabledByWriteFailure(log);
         FlightLog.event("into the void");            // still current, but no writer: no throw
         log.close();
@@ -811,11 +811,11 @@ public class FlightLogTest {
             };
         };
         FlightLog log = FlightLog.open("Partial");
-        log.number("kept", 1.0);
+        log.recordOutput("kept", 1.0);
         clock.advanceMillis(1_000);
         log.endLoop();                                  // flushed: "kept" is on storage
         limit[0] = 0;
-        log.text("lost", pad());                        // fails
+        log.recordOutput("lost", pad());                        // fails
         assertDisabledByWriteFailure(log);
         RecordedLog read = RecordedLog.of(target[0]);
         assertEquals(Collections.singletonList(1.0), read.doubles("/kept"));
@@ -828,8 +828,8 @@ public class FlightLogTest {
         RecordedLog log = record(l -> {
             for (int i = 0; i < 50; i++) {
                 clock.advanceMicros(100);
-                l.integer("loop", i);
-                l.number("half", (double) (i / 2));
+                l.recordOutput("loop", i);
+                l.recordOutput("half", (double) (i / 2));
                 if (i % 10 == 0) FlightLog.event("tick " + i);
             }
         });

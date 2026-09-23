@@ -2,16 +2,32 @@
 
 ## Getting the file off the robot
 
-Files are in `/sdcard/FIRST/logs` on the Control Hub, one per run. With the
-laptop on the robot's Wi-Fi, connect ADB (`adb connect 192.168.43.1:5555`),
-then either use Android Studio's **Device Explorer** (right-click → Save As) or
+With the laptop on the robot's Wi-Fi, open
+**<http://192.168.43.1:8080/corbelsflightlog>** and click a log. That page is
+served by the Robot Controller itself, on the same port as Program & Manage, so
+nothing needs installing.
+
+Or, over ADB (`adb connect 192.168.43.1:5555`):
 
 ```sh
 adb pull /sdcard/FIRST/logs .
 ```
 
-The **Download Logs** button on the hub's Manage page fetches the SDK's
+Files live in a `logs` folder inside the Robot Controller's FIRST folder --
+internal storage on a Control Hub, not a removable card. If that folder can't
+be used, `corbelsflightlog-ftc` falls back to the app's own private storage;
+the page and the Driver Station both show which folder is in use. To log somewhere
+else entirely -- a USB stick, say -- call `FtcFlightLog.useDirectory(folder)`
+before opening.
+
+The hub's **Download Logs** button, on its Manage page, fetches the SDK's
 `robotControllerLog.txt`, not these.
+
+## Housekeeping
+
+Logs are capped at **10 GiB** in total. When a log is opened and the folder is
+over that, the oldest `.wpilog` files are deleted until it fits. Change it with
+`FlightLog.maxDirectoryBytes`. Files that aren't `.wpilog` are never touched.
 
 ## In AdvantageScope
 

@@ -73,8 +73,8 @@ public class FtcGeometryTest {
 
     @Test
     public void nullsAreIgnored() {
-        FtcGeometry.pose3d(null, "k", new Pose3D(new Position(), degrees(0, 0, 0)));
-        FtcGeometry.rotation3d(null, "k", degrees(0, 0, 0));
+        FtcGeometry.recordOutput(null, "k", new Pose3D(new Position(), degrees(0, 0, 0)));
+        FtcGeometry.recordOutput(null, "k", degrees(0, 0, 0));
         FtcGeometry.heading(null, "k", null);
     }
 }

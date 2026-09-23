@@ -138,7 +138,7 @@ public class StructTypesTest {
         RecordedLog log = record(l -> {
             l.chassisSpeeds("k", 1, 2, 3);
             l.pose2d("k", 1, 2, 3);          // different struct type: refused
-            l.number("k", 1.0);              // not a struct at all: refused
+            l.recordOutput("k", 1.0);              // not a struct at all: refused
             l.chassisSpeeds("k", 4, 5, 6);   // same type: accepted
         });
         assertEquals("struct:ChassisSpeeds", log.entry("/k").type);

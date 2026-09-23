@@ -43,8 +43,17 @@ import java.util.function.LongSupplier;
  */
 public final class FlightLog {
 
-    /** Where log files go. Public so tests can point it at a temp folder. */
+    /** Where log files go. Public so tests can point it at a temp folder.
+     *  On a robot, corbelsflightlog-ftc sets this to the Robot Controller's
+     *  own storage. */
     public static File directory = new File("logs");
+
+    /**
+     * How much of {@link #directory} logs may occupy. At {@link #open}, the
+     * oldest {@code .wpilog} files are deleted until the total is under this.
+     * Without it the folder grows until the device fills and logging stops.
+     */
+    public static long maxDirectoryBytes = 10L * 1024 * 1024 * 1024;   // 10 GiB
 
     /**
      * Counter-clockwise quarter turns from Pedro's axes to AdvantageScope's FTC
@@ -142,6 +151,7 @@ public final class FlightLog {
             if (!directory.isDirectory() && !directory.mkdirs()) {
                 return disabled("can't create " + directory);
             }
+            prune(directory, maxDirectoryBytes);
             String stamp = new SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).format(new Date(wallClock.getAsLong()));
             String base = runName.replaceAll("[^A-Za-z0-9_-]", "_") + "-" + stamp;
             file = new File(directory, base + ".wpilog");
@@ -175,7 +185,7 @@ public final class FlightLog {
     // ------------------------------------------------------------ scalars
 
     /** A {@code double}. NaN and infinities are skipped (a gap in the graph). */
-    public void number(String key, double value) {
+    public void recordOutput(String key, double value) {
         if (writer == null || !isFinite(value)) return;
         long bits = Double.doubleToRawLongBits(value + 0.0);   // + 0.0: -0.0 == 0.0
         try {
@@ -190,11 +200,10 @@ public final class FlightLog {
 
     /**
      * A {@code float}, stored as a 4-byte float so {@code 0.1f} reads as 0.1.
-     * Deliberately not an overload of {@link #number}: Java would pick a
-     * float overload for an {@code int} argument, silently storing
-     * {@code number("x", 5)} as a float.
+     * Safe as an overload: for {@code recordOutput("x", 5)} Java prefers the
+     * {@code long} form, so an {@code int} stays an integer.
      */
-    public void float32(String key, float value) {
+    public void recordOutput(String key, float value) {
         if (writer == null || Float.isNaN(value) || Float.isInfinite(value)) return;
         long bits = Float.floatToRawIntBits(value + 0.0f);
         try {
@@ -208,7 +217,7 @@ public final class FlightLog {
     }
 
     /** An integer: counts, encoder ticks, states as numbers. */
-    public void integer(String key, long value) {
+    public void recordOutput(String key, long value) {
         if (writer == null) return;
         try {
             Channel ch = channel(key, "int64");
@@ -221,7 +230,7 @@ public final class FlightLog {
     }
 
     /** A true/false: limit switches, "has game piece", "at speed". */
-    public void bool(String key, boolean value) {
+    public void recordOutput(String key, boolean value) {
         if (writer == null) return;
         long bits = value ? 1 : 0;
         try {
@@ -235,7 +244,7 @@ public final class FlightLog {
     }
 
     /** Text, e.g. a state name. {@code null} is written as "null". */
-    public void text(String key, String value) {
+    public void recordOutput(String key, String value) {
         if (writer == null) return;
         String v = String.valueOf(value);
         try {
@@ -290,6 +299,35 @@ public final class FlightLog {
             }
             writer.appendRaw(ch.id, buf, buf.length, now());
             ch.last = xyh.clone();
+            ch.written = true;
+        } catch (IOException e) {
+            fail(e);
+        }
+    }
+
+    /** Several strings as one value. */
+    public void recordOutput(String key, String[] values) {
+        if (writer == null || values == null) return;
+        try {
+            Channel ch = channel(key, "string[]");
+            if (ch == null || (ch.written && Arrays.equals(values, (String[]) ch.last))) return;
+            writer.appendStringArray(ch.id, values, now());
+            ch.last = values.clone();
+            ch.written = true;
+        } catch (IOException e) {
+            fail(e);
+        }
+    }
+
+    /** Bytes, stored as they are -- the escape hatch for anything without a
+     *  type of its own. */
+    public void recordOutput(String key, byte[] value) {
+        if (writer == null || value == null) return;
+        try {
+            Channel ch = channel(key, "raw");
+            if (ch == null || (ch.written && Arrays.equals(value, (byte[]) ch.last))) return;
+            writer.appendRaw(ch.id, value, value.length, now());
+            ch.last = value.clone();
             ch.written = true;
         } catch (IOException e) {
             fail(e);
@@ -460,7 +498,7 @@ public final class FlightLog {
     // ------------------------------------------------------------ arrays
 
     /** Several doubles as one value, e.g. four motor powers. */
-    public void numbers(String key, double[] values) {
+    public void recordOutput(String key, double[] values) {
         if (writer == null) return;
         try {
             Channel ch = channel(key, "double[]");
@@ -474,7 +512,7 @@ public final class FlightLog {
     }
 
     /** Several integers as one value, e.g. four encoder positions. */
-    public void integers(String key, long[] values) {
+    public void recordOutput(String key, long[] values) {
         if (writer == null) return;
         try {
             Channel ch = channel(key, "int64[]");
@@ -487,8 +525,8 @@ public final class FlightLog {
         }
     }
 
-    /** Same as {@link #integers(String, long[])}, for {@code int[]}. */
-    public void integers(String key, int[] values) {
+    /** Same as {@link #recordOutput(String, long[])}, for {@code int[]}. */
+    public void recordOutput(String key, int[] values) {
         if (writer == null) return;
         try {
             Channel ch = channel(key, "int64[]");
@@ -510,7 +548,7 @@ public final class FlightLog {
     }
 
     /** Several true/falses as one value, e.g. which of three slots are full. */
-    public void bools(String key, boolean[] values) {
+    public void recordOutput(String key, boolean[] values) {
         if (writer == null) return;
         try {
             Channel ch = channel(key, "boolean[]");
@@ -639,6 +677,21 @@ public final class FlightLog {
 
     private static boolean same(double a, double b) {
         return Double.doubleToRawLongBits(a + 0.0) == Double.doubleToRawLongBits(b + 0.0);
+    }
+
+    /** Deletes oldest .wpilog files until the folder is under {@code capBytes}. */
+    private static void prune(File folder, long capBytes) {
+        File[] files = folder.listFiles((d, n) -> n.endsWith(".wpilog"));
+        if (files == null || files.length == 0) return;
+        long total = 0;
+        for (File f : files) total += f.length();
+        if (total <= capBytes) return;
+        Arrays.sort(files, (a, b) -> Long.compare(a.lastModified(), b.lastModified()));
+        for (File f : files) {
+            if (total <= capBytes) return;
+            long size = f.length();
+            if (f.delete()) total -= size;
+        }
     }
 
     private static boolean isFinite(double v) {

@@ -32,9 +32,16 @@ dependencies {
     // compileOnly: the robot project supplies its own FTC SDK and Panels.
     compileOnly "org.firstinspires.ftc:RobotCore:${ftcSdkVersion}"
     compileOnly "com.bylazar:fullpanels:${panelsVersion}"
+    // @WebHandlerRegistrar lives in FtcCommon; the web handlers return
+    // NanoHTTPD responses. Both are supplied by the Robot Controller at
+    // runtime -- compileOnly, so no version is forced on the robot project.
+    compileOnly "org.firstinspires.ftc:FtcCommon:${ftcSdkVersion}"
+    compileOnly "org.nanohttpd:nanohttpd:${nanohttpdVersion}"
     // compileOnly does not extend the test classpath, so the unit tests need
     // these declared again.
     testImplementation "org.firstinspires.ftc:RobotCore:${ftcSdkVersion}"
+    testImplementation "org.firstinspires.ftc:FtcCommon:${ftcSdkVersion}"
+    testImplementation "org.nanohttpd:nanohttpd:${nanohttpdVersion}"
     testImplementation 'junit:junit:4.13.2'
 }
 

@@ -4,8 +4,8 @@ WPILOG logging for FIRST Tech Challenge robots -- the format
 [AdvantageScope](https://docs.advantagescope.org) opens.
 
 ```java
-log.number("shooter/rpm", rpm);
-log.bool("intake/hasSample", hasSample);
+log.recordOutput("shooter/rpm", rpm);
+log.recordOutput("intake/hasSample", hasSample);
 FlightLog.event("kicker fired");
 ```
 
@@ -18,6 +18,7 @@ review afterwards -- unlike a dashboard, which samples and forgets.
 | `corbelsflightlog-core` | nothing | The WPILOG writer and logger |
 | `corbelsflightlog-pedro` | Pedro Pathing | Pose, path, aim point and Pedro's debug data |
 | `corbelsflightlog-ftc` | FTC SDK, Panels | The Control Hub's storage; mirroring to Panels |
+| `corbelsflightlog-wpilib` | WPILib geometry | WPILib's own `Pose2d`, `Pose3d`, `ChassisSpeeds` |
 
 ## Install
 

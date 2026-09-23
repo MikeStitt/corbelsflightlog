@@ -3,6 +3,7 @@ subprojects {
         mavenCentral()
         maven { url = 'https://repo.dairy.foundation/releases' }   // Pedro Pathing
         maven { url = 'https://mymaven.bylazar.com/releases' }     // Panels
+        maven { url = 'https://frcmaven.wpi.edu/artifactory/release/' }  // WPILib geometry
         google()
     }
 }

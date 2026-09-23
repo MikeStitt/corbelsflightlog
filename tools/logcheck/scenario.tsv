@@ -43,6 +43,10 @@ start	1000	/string	string	{"source":"parity"}
 data	6000	/string	héllo 🤖
 data	6001	/string
 data	6002	/string	a string with spaces, commas; and "quotes"
+start	1000	/strings	string[]
+data	7500	/strings	one,héllo 🤖,
+data	7501	/strings
+data	7502	/strings	just one
 start	1000	/raw	raw
 data	7000	/raw	0102ff00
 data	7001	/raw
