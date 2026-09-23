@@ -44,7 +44,8 @@ site is built, so they are dead in a local `sphinx` build.)
 
 ## Why it exists
 
-A dashboard shows a robot what is happening *now*. It samples — Panels every
-75 ms — and forgets. A WPILOG file keeps every change, survives the match, and
-opens later in a tool built for reading it. The two answer different questions,
+A dashboard shows what a robot is doing *now*, and is gone when the match ends.
+Panels samples periodically and forgets.
+A WPILOG file keeps every change, survives the match, and opens later in a tool
+built for reading it. The two answer different questions,
 and this library is the second one.

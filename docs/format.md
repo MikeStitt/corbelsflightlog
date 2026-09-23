@@ -15,11 +15,3 @@ Poses are written as WPILib `Pose2d` structs — three little-endian doubles, x,
 y and rotation — with the schema entries AdvantageScope needs
 (`/.schema/struct:Pose2d` and its parts), exactly as WPILib's `addStructSchema`
 writes them.
-
-## A WPILib bug worth knowing
-
-WPILib's **Java** reader, `DataLogIterator.hasNext()`, only reports another
-record when 16 or more bytes remain, but a record can be as small as 5 bytes.
-A plain `for (DataLogRecord r : reader)` loop therefore drops the last records
-of a log. `forEachRemaining()` is correct. This affects anyone reading logs in
-Java; AdvantageScope has its own decoder and is unaffected.

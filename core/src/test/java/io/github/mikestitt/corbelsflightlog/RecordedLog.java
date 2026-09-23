@@ -54,12 +54,14 @@ public final class RecordedLog {
         this.reader = reader;
         assertTrue("WPILib's reader rejects the file", reader.isValid());
         Map<Integer, Entry> byId = new HashMap<>();
-        // NOT a for-each loop. WPILib's DataLogIterator.hasNext() (v2026.2.2,
-        // and still on WPILib's main branch in September 2026) only reports a
-        // next record if 16 or more bytes remain, but a record can be as small
-        // as 5 bytes -- so for-each silently drops the last records of a log
-        // whenever they total under 16 bytes. forEachRemaining() uses the
-        // correct end test (position < size) and sees every record.
+        // Why forEachRemaining() and not a for-each loop:
+        // Observed 2026-09-22 with the WPILib 2026.2.2
+        // DataLogReader vendored beside this file: reading an in-memory log of
+        // three records (one Start and two 5-byte booleans), a
+        // `for (DataLogRecord r : reader)` loop yielded 1 record, while
+        // reader.iterator().forEachRemaining(...) yielded all 3. In that
+        // version's DataLogIterator source, hasNext() returns
+        // (m_pos + 16) <= size, while forEachRemaining() tests m_pos < size.
         reader.iterator().forEachRemaining(all::add);
         for (DataLogRecord r : all) {
             if (r.isStart()) {

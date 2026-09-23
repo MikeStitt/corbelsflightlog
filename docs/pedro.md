@@ -50,16 +50,13 @@ Types are chosen from the value, and an unrecognised type is stored as text, so
 entries a future Pedro adds appear on their own.
 
 :::{note}
-In teleop the `algorithm` entries are stale. Pedro's algorithm doesn't run in
-manual mode, so they hold whatever the last path left behind.
+Each entry holds whatever Pedro reported on the most recent `update()`, so read
+the `algorithm` entries alongside `Pedro/Mode`.
 :::
 
-## Two traps this handles for you
+## What gets logged when there is no path
 
-**`tangentialVelocity()` throws in teleop.** It is velocity dotted with the path
-tangent, and Pedro only computes that tangent while following or holding. This
-logs `NaN` instead, which is skipped.
-
-**`poseAt()` throws for one loop at the end of a path.** Pedro 3.0.x empties the
-segment queue but clears the path on the *next* update, so `currentPath()` is
-non-null while `currentSegment()` is null. This checks the segment.
+Speed along the path needs a path: `Pedro/vel/tangential_ips` is logged while
+the follower is following or holding, and `NaN` — which is skipped — otherwise.
+`Pedro/Path` is written from the segment currently being followed, and cleared
+when there is none.

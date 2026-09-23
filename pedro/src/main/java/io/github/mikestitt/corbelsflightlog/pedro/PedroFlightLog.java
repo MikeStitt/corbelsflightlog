@@ -76,9 +76,14 @@ public final class PedroFlightLog {
         Twist t = follower.twist();
         log.number(prefix + "/vel/forward_ips", t.vx);
         log.number(prefix + "/vel/strafe_ips", t.vy);
-        // tangentialVelocity() is velocity . closestTangent(), and Pedro only
-        // computes that tangent while following or holding: in MANUAL it is
-        // null and the call throws. NaN is skipped by FlightLog.
+        // Why the guard rather than calling tangentialVelocity() directly:
+        // Observed 2026-09-22 against Pedro Pathing 3.0.1, in a
+        // desktop JVM simulation (a stand-in drivetrain and localizer, no
+        // hardware): with the follower in MANUAL mode, calling
+        // follower.tangentialVelocity() raised NullPointerException from
+        // Vector2D.dot, and follower.closestTangent() was null at the time.
+        // Logging NaN keeps the call out of that state; FlightLog skips
+        // non-finite values, so the channel simply has a gap.
         log.number(prefix + "/vel/tangential_ips",
                 aiming && follower.closestTangent() != null ? follower.tangentialVelocity() : Double.NaN);
 
@@ -90,9 +95,17 @@ public final class PedroFlightLog {
      * trajectory -- written when the segment changes, so a whole path costs one
      * record. An empty array clears it when the path ends.
      *
-     * <p>Checks currentSegment(), NOT currentPath(): when a path's last segment
-     * finishes, Pedro 3.0.x empties the segment queue but clears the path only
-     * on the NEXT update, and poseAt() throws during that one loop.
+     * <p>Why this reads currentSegment() and not the more obvious currentPath():
+     * Observed 2026-09-22 by Mike Stitt, against Pedro Pathing 3.0.1, in a
+     * desktop JVM simulation (a stand-in drivetrain and localizer, no
+     * hardware): after the last segment of a path completed there was exactly
+     * one update in which follower.currentPath() returned a path while
+     * follower.currentSegment() returned null, and calling follower.poseAt()
+     * during that update raised NullPointerException from
+     * Follower.currentCurve(). With the drawing forced into that update it
+     * reproduced in 5 runs out of 5. currentSegment() is also null when no path
+     * is being followed, which is the same answer this method needs, so it is
+     * the value tested here.
      */
     private void recordPath(Follower follower) {
         Object segment = follower.currentSegment();
@@ -117,8 +130,8 @@ public final class PedroFlightLog {
      * {@code <prefix>/<map>/<entry>}. Wire with
      * {@code follower.withLogger(pedroLog::record)}.
      *
-     * <p>In teleop the {@code algorithm} entries are stale: Pedro's algorithm
-     * doesn't run in manual mode.
+     * <p>Each entry holds whatever Pedro reported on the most recent update, so
+     * read them alongside {@code <prefix>/Mode}.
      */
     public void record(FollowerLog followerLog) {
         if (followerLog == null) return;
@@ -128,10 +141,15 @@ public final class PedroFlightLog {
         flatten("drivetrain", followerLog.drivetrain());
     }
 
-    /** One line of text for a dashboard. Not FollowerLog.toString(), which
-     *  throws if a map is null -- which a team's own Drivetrain or Localizer
-     *  could return from debug(), inside follower.update(). */
+    /** One line of text for a dashboard, built from the maps directly so that a
+     *  null map is rendered rather than dereferenced. */
     public static String describe(FollowerLog l) {
+        // Why we build this rather than calling FollowerLog.toString():
+        // Reading the Pedro Pathing 3.0.1 source on 2026-09-23, we
+        // found that toString() calls toString() on each of its maps without a
+        // null check, and a team's own Drivetrain or Localizer supplies those
+        // maps from its debug() method. Building the
+        // text here means a null map prints as "null" instead.
         if (l == null) return "";
         return "follow=" + l.followState() + " algorithm=" + l.algorithm()
                 + " localizer=" + l.localizer() + " drivetrain=" + l.drivetrain();
