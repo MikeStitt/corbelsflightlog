@@ -49,6 +49,7 @@ jobs:
           files: |
             core/build/libs/*.jar
             pedro/build/libs/*.jar
+            wpilib/build/libs/*.jar
             ftc/build/outputs/aar/*.aar
 
       # Documentation for this version, published alongside the others.
@@ -58,7 +59,7 @@ jobs:
       - run: pip install -r docs/requirements.txt
       - name: Build the docs and the Javadoc
         run: |
-          ./gradlew :core:javadoc :pedro:javadoc
+          ./gradlew :core:javadoc :pedro:javadoc :wpilib:javadoc
           python docs/build_site.py --version "$GITHUB_REF_NAME"
       - name: Publish to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
