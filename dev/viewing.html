@@ -243,14 +243,28 @@
 <h1>Viewing a log<a class="headerlink" href="#viewing-a-log" title="Link to this heading">¶</a></h1>
 <section id="getting-the-file-off-the-robot">
 <h2>Getting the file off the robot<a class="headerlink" href="#getting-the-file-off-the-robot" title="Link to this heading">¶</a></h2>
-<p>Files are in <code class="docutils literal notranslate"><span class="pre">/sdcard/FIRST/logs</span></code> on the Control Hub, one per run. With the
-laptop on the robot’s Wi-Fi, connect ADB (<code class="docutils literal notranslate"><span class="pre">adb</span> <span class="pre">connect</span> <span class="pre">192.168.43.1:5555</span></code>),
-then either use Android Studio’s <strong>Device Explorer</strong> (right-click → Save As) or</p>
+<p>With the laptop on the robot’s Wi-Fi, open
+<strong><a class="reference external" href="http://192.168.43.1:8080/corbelsflightlog">http://192.168.43.1:8080/corbelsflightlog</a></strong> and click a log. That page is
+served by the Robot Controller itself, on the same port as Program &amp; Manage, so
+nothing needs installing.</p>
+<p>Or, over ADB (<code class="docutils literal notranslate"><span class="pre">adb</span> <span class="pre">connect</span> <span class="pre">192.168.43.1:5555</span></code>):</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>adb<span class="w"> </span>pull<span class="w"> </span>/sdcard/FIRST/logs<span class="w"> </span>.
 </pre></div>
 </div>
-<p>The <strong>Download Logs</strong> button on the hub’s Manage page fetches the SDK’s
+<p>Files live in a <code class="docutils literal notranslate"><span class="pre">logs</span></code> folder inside the Robot Controller’s FIRST folder –
+internal storage on a Control Hub, not a removable card. If that folder can’t
+be used, <code class="docutils literal notranslate"><span class="pre">corbelsflightlog-ftc</span></code> falls back to the app’s own private storage;
+the page and the Driver Station both show which folder is in use. To log somewhere
+else entirely – a USB stick, say – call <code class="docutils literal notranslate"><span class="pre">FtcFlightLog.useDirectory(folder)</span></code>
+before opening.</p>
+<p>The hub’s <strong>Download Logs</strong> button, on its Manage page, fetches the SDK’s
 <code class="docutils literal notranslate"><span class="pre">robotControllerLog.txt</span></code>, not these.</p>
+</section>
+<section id="housekeeping">
+<h2>Housekeeping<a class="headerlink" href="#housekeeping" title="Link to this heading">¶</a></h2>
+<p>Logs are capped at <strong>10 GiB</strong> in total. When a log is opened and the folder is
+over that, the oldest <code class="docutils literal notranslate"><span class="pre">.wpilog</span></code> files are deleted until it fits. Change it with
+<code class="docutils literal notranslate"><span class="pre">FlightLog.maxDirectoryBytes</span></code>. Files that aren’t <code class="docutils literal notranslate"><span class="pre">.wpilog</span></code> are never touched.</p>
 </section>
 <section id="in-advantagescope">
 <h2>In AdvantageScope<a class="headerlink" href="#in-advantagescope" title="Link to this heading">¶</a></h2>
@@ -336,6 +350,7 @@ is written, so it changes future logs and not old ones.</p>
             <ul>
 <li><a class="reference internal" href="#">Viewing a log</a><ul>
 <li><a class="reference internal" href="#getting-the-file-off-the-robot">Getting the file off the robot</a></li>
+<li><a class="reference internal" href="#housekeeping">Housekeeping</a></li>
 <li><a class="reference internal" href="#in-advantagescope">In AdvantageScope</a></li>
 <li><a class="reference internal" href="#field-orientation">Field orientation</a></li>
 </ul>

@@ -143,6 +143,28 @@ loadScripts(document, 'script');</script>
 <div class="block">Pedro's own debug data, one channel per entry, named
  <code>&lt;prefix&gt;/&lt;map&gt;/&lt;entry&gt;</code>.</div>
 </div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#recordOutput(io.github.mikestitt.corbelsflightlog.FlightLog,java.lang.String,com.pedropathing.math.Pose)" class="member-name-link">recordOutput</a><wbr>(io.github.mikestitt.corbelsflightlog.FlightLog&nbsp;log,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key,
+ com.pedropathing.math.Pose&nbsp;pose)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Pedro's own pose, as a WPILib <code>Pose2d</code>: inches and a corner origin
+ converted to metres and the field frame AdvantageScope draws.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#recordOutput(io.github.mikestitt.corbelsflightlog.FlightLog,java.lang.String,com.pedropathing.math.Twist)" class="member-name-link">recordOutput</a><wbr>(io.github.mikestitt.corbelsflightlog.FlightLog&nbsp;log,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key,
+ com.pedropathing.math.Twist&nbsp;twist)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Pedro's body-frame speeds, as a WPILib <code>Twist2d</code> in metres.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#recordOutput(io.github.mikestitt.corbelsflightlog.FlightLog,java.lang.String,com.pedropathing.math.Velocity)" class="member-name-link">recordOutput</a><wbr>(io.github.mikestitt.corbelsflightlog.FlightLog&nbsp;log,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key,
+ com.pedropathing.math.Velocity&nbsp;velocity)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Pedro's world-frame speeds, as a WPILib <code>ChassisSpeeds</code> in metres.</div>
+</div>
 </div>
 </div>
 </div>
@@ -182,6 +204,34 @@ loadScripts(document, 'script');</script>
 <section class="method-details" id="method-detail">
 <h2>Method Details</h2>
 <ul class="member-list">
+<li>
+<section class="detail" id="recordOutput(io.github.mikestitt.corbelsflightlog.FlightLog,java.lang.String,com.pedropathing.math.Pose)">
+<h3>recordOutput</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">recordOutput</span><wbr><span class="parameters">(io.github.mikestitt.corbelsflightlog.FlightLog&nbsp;log,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key,
+ com.pedropathing.math.Pose&nbsp;pose)</span></div>
+<div class="block">Pedro's own pose, as a WPILib <code>Pose2d</code>: inches and a corner origin
+ converted to metres and the field frame AdvantageScope draws.</div>
+</section>
+</li>
+<li>
+<section class="detail" id="recordOutput(io.github.mikestitt.corbelsflightlog.FlightLog,java.lang.String,com.pedropathing.math.Twist)">
+<h3>recordOutput</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">recordOutput</span><wbr><span class="parameters">(io.github.mikestitt.corbelsflightlog.FlightLog&nbsp;log,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key,
+ com.pedropathing.math.Twist&nbsp;twist)</span></div>
+<div class="block">Pedro's body-frame speeds, as a WPILib <code>Twist2d</code> in metres.</div>
+</section>
+</li>
+<li>
+<section class="detail" id="recordOutput(io.github.mikestitt.corbelsflightlog.FlightLog,java.lang.String,com.pedropathing.math.Velocity)">
+<h3>recordOutput</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">recordOutput</span><wbr><span class="parameters">(io.github.mikestitt.corbelsflightlog.FlightLog&nbsp;log,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key,
+ com.pedropathing.math.Velocity&nbsp;velocity)</span></div>
+<div class="block">Pedro's world-frame speeds, as a WPILib <code>ChassisSpeeds</code> in metres.</div>
+</section>
+</li>
 <li>
 <section class="detail" id="record(com.pedropathing.follower.Follower)">
 <h3>record</h3>

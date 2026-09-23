@@ -7,8 +7,8 @@ Write a value once and it lands in a file on the robot, timestamped and
 recorded only when it changes:
 
 ```java
-log.number("shooter/rpm", rpm);
-log.bool("intake/hasSample", hasSample);
+log.recordOutput("shooter/rpm", rpm);
+log.recordOutput("intake/hasSample", hasSample);
 log.pose("Robot/Pose", x, y, heading);     // drawn on AdvantageScope's field
 FlightLog.event("kicker fired");           // one-off, with its exact time
 ```
@@ -20,6 +20,7 @@ FlightLog.event("kicker fired");           // one-off, with its exact time
 | `corbelsflightlog-core` | nothing | The WPILOG writer and the logger. Any Java project. |
 | `corbelsflightlog-pedro` | Pedro Pathing | The follower's pose, path, aim point and debug data |
 | `corbelsflightlog-ftc` | FTC SDK, Panels | Logging to the Control Hub; mirroring values to Panels; SDK geometry |
+| `corbelsflightlog-wpilib` | WPILib geometry | Logging WPILib's own `Pose2d`, `Pose3d`, `ChassisSpeeds`… |
 
 ```{toctree}
 :maxdepth: 2

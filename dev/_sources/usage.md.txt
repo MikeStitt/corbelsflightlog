@@ -42,6 +42,16 @@ FlightLog log = FlightLog.open("MyRun");
 `float32` is deliberately not an overload of `number`: Java would resolve
 `number("x", 5)` — an `int` — to a float overload and quietly store a float.
 
+### Strings and bytes
+
+`recordOutput(key, String[])` writes a `string[]`; `recordOutput(key, byte[])`
+writes `raw`, the escape hatch for anything without a type of its own.
+
+`recordOutput` is overloaded, so the Java type decides what is stored: `5` is
+an integer, `5.0` a double, `5f` a float. One consequence -- a bare `null` is
+ambiguous between the array overloads, so cast it:
+`recordOutput("k", (double[]) null)`.
+
 ## Geometry
 
 WPILib struct types, which AdvantageScope draws on its 2D and 3D field tabs and

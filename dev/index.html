@@ -245,8 +245,8 @@
 <a class="reference external" href="https://docs.advantagescope.org">AdvantageScope</a> opens.</p>
 <p>Write a value once and it lands in a file on the robot, timestamped and
 recorded only when it changes:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">log</span><span class="p">.</span><span class="na">number</span><span class="p">(</span><span class="s">"shooter/rpm"</span><span class="p">,</span><span class="w"> </span><span class="n">rpm</span><span class="p">);</span>
-<span class="n">log</span><span class="p">.</span><span class="na">bool</span><span class="p">(</span><span class="s">"intake/hasSample"</span><span class="p">,</span><span class="w"> </span><span class="n">hasSample</span><span class="p">);</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">log</span><span class="p">.</span><span class="na">recordOutput</span><span class="p">(</span><span class="s">"shooter/rpm"</span><span class="p">,</span><span class="w"> </span><span class="n">rpm</span><span class="p">);</span>
+<span class="n">log</span><span class="p">.</span><span class="na">recordOutput</span><span class="p">(</span><span class="s">"intake/hasSample"</span><span class="p">,</span><span class="w"> </span><span class="n">hasSample</span><span class="p">);</span>
 <span class="n">log</span><span class="p">.</span><span class="na">pose</span><span class="p">(</span><span class="s">"Robot/Pose"</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="n">heading</span><span class="p">);</span><span class="w">     </span><span class="c1">// drawn on AdvantageScope's field</span>
 <span class="n">FlightLog</span><span class="p">.</span><span class="na">event</span><span class="p">(</span><span class="s">"kicker fired"</span><span class="p">);</span><span class="w">           </span><span class="c1">// one-off, with its exact time</span>
 </pre></div>
@@ -273,6 +273,10 @@ recorded only when it changes:</p>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">corbelsflightlog-ftc</span></code></p></td>
 <td><p>FTC SDK, Panels</p></td>
 <td><p>Logging to the Control Hub; mirroring values to Panels; SDK geometry</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">corbelsflightlog-wpilib</span></code></p></td>
+<td><p>WPILib geometry</p></td>
+<td><p>Logging WPILib’s own <code class="docutils literal notranslate"><span class="pre">Pose2d</span></code>, <code class="docutils literal notranslate"><span class="pre">Pose3d</span></code>, <code class="docutils literal notranslate"><span class="pre">ChassisSpeeds</span></code>…</p></td>
 </tr>
 </tbody>
 </table>
@@ -302,6 +306,7 @@ recorded only when it changes:</p>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="viewing.html">Viewing a log</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="viewing.html#getting-the-file-off-the-robot">Getting the file off the robot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="viewing.html#housekeeping">Housekeeping</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viewing.html#in-advantagescope">In AdvantageScope</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viewing.html#field-orientation">Field orientation</a></li>
 </ul>
