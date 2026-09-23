@@ -1,3 +1,11 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        google()          // the Android Gradle Plugin lives here, not on the portal
+        mavenCentral()
+    }
+}
+
 rootProject.name = 'corbelsflightlog'
 
 include ':core'

@@ -1,5 +1,7 @@
 plugins {
-    id 'com.android.library'
+    // A version is required: the plugin is resolved through pluginManagement
+    // in settings.gradle, from google().
+    id 'com.android.library' version '8.13.2'
     id 'maven-publish'
 }
 

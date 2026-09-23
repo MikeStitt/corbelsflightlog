@@ -72,9 +72,14 @@ jobs:
         with:
           java-version: '17'
           distribution: temurin
-      # :ftc is an Android library and is only included when an SDK is present.
-      # setup-android sets ANDROID_HOME, which settings.gradle looks for.
-      - uses: android-actions/setup-android@v3
+      # GitHub's ubuntu runners already ship the Android SDK with ANDROID_HOME
+      # set, which is what settings.gradle looks for -- so no setup action is
+      # needed. (android-actions/setup-android@v3 is what was failing here.)
+      - name: Show the Android SDK the runner provides
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
+          test -n "$ANDROID_HOME" || { echo 'No Android SDK on this runner.'; exit 1; }
       - uses: gradle/actions/setup-gradle@v4
       - name: Fail early if settings.gradle did not include :ftc
         run: ./gradlew projects | grep -q "':ftc'" || {

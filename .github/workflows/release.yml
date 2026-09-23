@@ -24,8 +24,8 @@ jobs:
         with:
           java-version: '17'
           distribution: temurin
-      # So :ftc is included and its AAR can be attached to the release.
-      - uses: android-actions/setup-android@v3
+      # :ftc is included automatically: the runner's own Android SDK sets
+      # ANDROID_HOME, which settings.gradle looks for.
       - uses: gradle/actions/setup-gradle@v4
 
       - name: Check the tag matches the version in gradle.properties
