@@ -25,6 +25,11 @@ test {
     // the Python WPILib-parity tests. See tools/logcheck/README.md.
     systemProperty 'logcheck.scenario', rootProject.file('tools/logcheck/scenario.tsv')
     systemProperty 'logcheck.out', layout.buildDirectory.dir('logcheck').get().asFile
+    // These .wpilog files are written by the test, so declare them as an
+    // output. Without this Gradle treats them as an untracked side effect: a
+    // cached or up-to-date test task restores the reports but never writes the
+    // files, and whatever consumes them finds an empty directory.
+    outputs.dir(layout.buildDirectory.dir('logcheck'))
     testLogging { events 'passed', 'skipped', 'failed' }
 }
 
