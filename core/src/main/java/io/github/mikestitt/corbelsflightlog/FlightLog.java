@@ -67,6 +67,14 @@ public final class FlightLog {
             {"Translation2d", "double x;double y"},
             {"Rotation2d", "double value"},
             {"Pose2d", "Translation2d translation;Rotation2d rotation"},
+            {"Twist2d", "double dx;double dy;double dtheta"},
+            {"ChassisSpeeds", "double vx;double vy;double omega"},
+            {"MecanumDriveWheelSpeeds",
+                    "double front_left;double front_right;double rear_left;double rear_right"},
+            {"Translation3d", "double x;double y;double z"},
+            {"Quaternion", "double w;double x;double y;double z"},
+            {"Rotation3d", "Quaternion q"},
+            {"Pose3d", "Translation3d translation;Rotation3d rotation"},
     };
 
     /** Opens the file's output stream. Replaced by tests to simulate storage
@@ -110,6 +118,7 @@ public final class FlightLog {
     private final Map<String, Channel> channels = new HashMap<>();
     private final Set<String> typeWarnings = new HashSet<>();
     private final byte[] poseBuffer = new byte[POSE_BYTES];
+    private final byte[] structBuffer = new byte[56];
 
     private FlightLog(WpiLogWriter writer, File file, String problem) {
         this.writer = writer;
@@ -285,6 +294,167 @@ public final class FlightLog {
         } catch (IOException e) {
             fail(e);
         }
+    }
+
+    // ------------------------------------------------------------ structs
+    //
+    // WPILib struct types, which AdvantageScope draws directly: a pose on the
+    // 2D or 3D field, speeds and wheel speeds in its tables and graphs. Values
+    // are in WPILib's units -- metres, radians, metres per second -- and are
+    // written as given, with no field-frame conversion. (pose(...) above is the
+    // exception: it converts from Pedro's inches and corner origin.)
+    //
+    // Each is skipped when any component is non-finite, and written only when
+    // the encoded value changes.
+
+    /** A point, in metres. */
+    public void translation2d(String key, double x, double y) {
+        if (!finite(x) || !finite(y)) return;
+        putDouble(structBuffer, 0, x);
+        putDouble(structBuffer, 8, y);
+        writeStruct(key, "Translation2d", 16);
+    }
+
+    /** An angle, in radians. */
+    public void rotation2d(String key, double radians) {
+        if (!finite(radians)) return;
+        putDouble(structBuffer, 0, radians);
+        writeStruct(key, "Rotation2d", 8);
+    }
+
+    /** A pose already in WPILib's frame: metres and radians, no conversion. */
+    public void pose2d(String key, double x, double y, double radians) {
+        if (!finite(x) || !finite(y) || !finite(radians)) return;
+        putDouble(structBuffer, 0, x);
+        putDouble(structBuffer, 8, y);
+        putDouble(structBuffer, 16, radians);
+        writeStruct(key, "Pose2d", 24);
+    }
+
+    /** A movement in the robot's own frame: metres and radians. */
+    public void twist2d(String key, double dx, double dy, double dtheta) {
+        if (!finite(dx) || !finite(dy) || !finite(dtheta)) return;
+        putDouble(structBuffer, 0, dx);
+        putDouble(structBuffer, 8, dy);
+        putDouble(structBuffer, 16, dtheta);
+        writeStruct(key, "Twist2d", 24);
+    }
+
+    /** How fast the robot is moving: metres per second and radians per second. */
+    public void chassisSpeeds(String key, double vx, double vy, double omega) {
+        if (!finite(vx) || !finite(vy) || !finite(omega)) return;
+        putDouble(structBuffer, 0, vx);
+        putDouble(structBuffer, 8, vy);
+        putDouble(structBuffer, 16, omega);
+        writeStruct(key, "ChassisSpeeds", 24);
+    }
+
+    /** Four wheels at once -- speeds, or powers, whichever you pass. */
+    public void mecanumWheelSpeeds(String key, double frontLeft, double frontRight,
+                                   double rearLeft, double rearRight) {
+        if (!finite(frontLeft) || !finite(frontRight) || !finite(rearLeft) || !finite(rearRight)) return;
+        putDouble(structBuffer, 0, frontLeft);
+        putDouble(structBuffer, 8, frontRight);
+        putDouble(structBuffer, 16, rearLeft);
+        putDouble(structBuffer, 24, rearRight);
+        writeStruct(key, "MecanumDriveWheelSpeeds", 32);
+    }
+
+    /** A point in space, in metres. */
+    public void translation3d(String key, double x, double y, double z) {
+        if (!finite(x) || !finite(y) || !finite(z)) return;
+        putDouble(structBuffer, 0, x);
+        putDouble(structBuffer, 8, y);
+        putDouble(structBuffer, 16, z);
+        writeStruct(key, "Translation3d", 24);
+    }
+
+    /** A rotation as a quaternion. */
+    public void quaternion(String key, double w, double x, double y, double z) {
+        if (!finite(w) || !finite(x) || !finite(y) || !finite(z)) return;
+        putDouble(structBuffer, 0, w);
+        putDouble(structBuffer, 8, x);
+        putDouble(structBuffer, 16, y);
+        putDouble(structBuffer, 24, z);
+        writeStruct(key, "Quaternion", 32);
+    }
+
+    /** A 3D rotation. WPILib stores it as a quaternion, not as angles. */
+    public void rotation3d(String key, double w, double x, double y, double z) {
+        if (!finite(w) || !finite(x) || !finite(y) || !finite(z)) return;
+        putDouble(structBuffer, 0, w);
+        putDouble(structBuffer, 8, x);
+        putDouble(structBuffer, 16, y);
+        putDouble(structBuffer, 24, z);
+        writeStruct(key, "Rotation3d", 32);
+    }
+
+    /** A pose in space: metres, and a rotation as a quaternion. */
+    public void pose3d(String key, double x, double y, double z,
+                       double qw, double qx, double qy, double qz) {
+        if (!finite(x) || !finite(y) || !finite(z)
+                || !finite(qw) || !finite(qx) || !finite(qy) || !finite(qz)) return;
+        putDouble(structBuffer, 0, x);
+        putDouble(structBuffer, 8, y);
+        putDouble(structBuffer, 16, z);
+        putDouble(structBuffer, 24, qw);
+        putDouble(structBuffer, 32, qx);
+        putDouble(structBuffer, 40, qy);
+        putDouble(structBuffer, 48, qz);
+        writeStruct(key, "Pose3d", 56);
+    }
+
+    /**
+     * A pose in space from yaw, pitch and roll, in radians -- the form the FTC
+     * SDK reports orientation in. Converted to the quaternion WPILib stores,
+     * applying roll, then pitch, then yaw.
+     */
+    public void pose3d(String key, double x, double y, double z,
+                       double yawRad, double pitchRad, double rollRad) {
+        if (!finite(yawRad) || !finite(pitchRad) || !finite(rollRad)) return;
+        double cy = Math.cos(yawRad * 0.5);
+        double sy = Math.sin(yawRad * 0.5);
+        double cp = Math.cos(pitchRad * 0.5);
+        double sp = Math.sin(pitchRad * 0.5);
+        double cr = Math.cos(rollRad * 0.5);
+        double sr = Math.sin(rollRad * 0.5);
+        pose3d(key, x, y, z,
+                cr * cp * cy + sr * sp * sy,
+                sr * cp * cy - cr * sp * sy,
+                cr * sp * cy + sr * cp * sy,
+                cr * cp * sy - sr * sp * cy);
+    }
+
+    /** Writes structBuffer[0, length) as struct:type, when it has changed. */
+    private void writeStruct(String key, String type, int length) {
+        if (writer == null) return;
+        try {
+            Channel ch = channel(key, "struct:" + type);
+            if (ch == null) return;
+            byte[] last = (byte[]) ch.last;
+            if (ch.written && last != null && regionEquals(last, structBuffer, length)) return;
+            writer.appendRaw(ch.id, structBuffer, length, now());
+            if (last == null || last.length != length) {
+                last = new byte[length];
+                ch.last = last;
+            }
+            System.arraycopy(structBuffer, 0, last, 0, length);
+            ch.written = true;
+        } catch (IOException e) {
+            fail(e);
+        }
+    }
+
+    private static boolean regionEquals(byte[] a, byte[] b, int length) {
+        if (a.length != length) return false;
+        for (int i = 0; i < length; i++) {
+            if (a[i] != b[i]) return false;
+        }
+        return true;
+    }
+
+    private static boolean finite(double v) {
+        return !Double.isNaN(v) && !Double.isInfinite(v);
     }
 
     // ------------------------------------------------------------ arrays

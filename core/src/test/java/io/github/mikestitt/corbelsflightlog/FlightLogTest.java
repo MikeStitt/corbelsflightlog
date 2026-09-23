@@ -93,9 +93,12 @@ public class FlightLogTest {
         File f = onlyFile();
         assertEquals("Test-" + stamp() + ".wpilog", f.getName());
         assertEquals("Corbels FlightLog", log.reader.getExtraHeader());
-        // Exactly WPILib 2026's addStructSchema output, in the same order.
+        // Exactly WPILib 2026's addStructSchema output, in dependency order.
         assertEquals(Arrays.asList("/.schema/struct:Translation2d", "/.schema/struct:Rotation2d",
-                "/.schema/struct:Pose2d"), new java.util.ArrayList<>(log.entries.keySet()));
+                "/.schema/struct:Pose2d", "/.schema/struct:Twist2d", "/.schema/struct:ChassisSpeeds",
+                "/.schema/struct:MecanumDriveWheelSpeeds", "/.schema/struct:Translation3d",
+                "/.schema/struct:Quaternion", "/.schema/struct:Rotation3d", "/.schema/struct:Pose3d"),
+                new java.util.ArrayList<>(log.entries.keySet()));
         assertEquals(Collections.singletonList("double x;double y"), log.strings("/.schema/struct:Translation2d"));
         assertEquals(Collections.singletonList("double value"), log.strings("/.schema/struct:Rotation2d"));
         assertEquals(Collections.singletonList("Translation2d translation;Rotation2d rotation"),

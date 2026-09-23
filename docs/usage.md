@@ -42,6 +42,31 @@ FlightLog log = FlightLog.open("MyRun");
 `float32` is deliberately not an overload of `number`: Java would resolve
 `number("x", 5)` — an `int` — to a float overload and quietly store a float.
 
+## Geometry
+
+WPILib struct types, which AdvantageScope draws on its 2D and 3D field tabs and
+treats as one value in tables and graphs. Units are WPILib's: metres, radians,
+metres per second. These are written as given -- `pose(...)` above is the one
+that converts from Pedro's inches and corner origin.
+
+| Call | Written as |
+|---|---|
+| `translation2d(key, x, y)` | `Translation2d` |
+| `rotation2d(key, radians)` | `Rotation2d` |
+| `pose2d(key, x, y, radians)` | `Pose2d` |
+| `twist2d(key, dx, dy, dtheta)` | `Twist2d` |
+| `chassisSpeeds(key, vx, vy, omega)` | `ChassisSpeeds` |
+| `mecanumWheelSpeeds(key, fl, fr, rl, rr)` | `MecanumDriveWheelSpeeds` |
+| `translation3d(key, x, y, z)` | `Translation3d` |
+| `quaternion(key, w, x, y, z)` | `Quaternion` |
+| `rotation3d(key, w, x, y, z)` | `Rotation3d` |
+| `pose3d(key, x, y, z, qw, qx, qy, qz)` | `Pose3d` |
+| `pose3d(key, x, y, z, yaw, pitch, roll)` | `Pose3d`, angles converted to a quaternion |
+
+A 3D rotation is a quaternion, not three angles: `Rotation3d` is
+`Quaternion q`, and `Pose3d` is 56 bytes. The yaw/pitch/roll form applies roll,
+then pitch, then yaw.
+
 ## Only changes are recorded
 
 A value is written when it differs from the last one under that key.

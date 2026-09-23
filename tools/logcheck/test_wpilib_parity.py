@@ -178,22 +178,38 @@ class StructParity(unittest.TestCase):
     """Our Pose2d structs vs WPILib's struct schema, encoder and geometry."""
 
     def wpilib_schemas(self):
-        with tempfile.TemporaryDirectory() as d:
-            p = os.path.join(d, "schema.wpilog")
-            log = wpiutil.DataLogWriter(p, "")
-            log.addStructSchema(geom.Pose2d, 1)
-            log.flush()
-            log.stop()
-            del log
-            _, recs = decode(p)
-        return schema_view(recs)
+        """Every struct type we publish, as WPILib itself describes it."""
+        import wpiutil.wpistruct as wpistruct
+        import wpimath.kinematics as kin
+
+        types = [geom.Translation2d, geom.Rotation2d, geom.Pose2d, geom.Twist2d,
+                 kin.ChassisSpeeds, kin.MecanumDriveWheelSpeeds, geom.Translation3d,
+                 geom.Quaternion, geom.Rotation3d, geom.Pose3d]
+        return {f"/.schema/struct:{wpistruct.getTypeName(t)}": wpistruct.getSchema(t)
+                for t in types}
 
     def test_schema_entries_match_wpilib_exactly(self):
         theirs = self.wpilib_schemas()
-        self.assertEqual(3, len(theirs))
         for q in range(QUARTER_TURNS):
             _, recs = decode(our_pose_file(q))
-            self.assertEqual(theirs, schema_view(recs), f"quarter turns {q}")
+            ours = schema_view(recs)
+            self.assertEqual(len(theirs), len(ours), f"quarter turns {q}")
+            for name, kind, text in ours:
+                self.assertEqual("structschema", kind, name)
+                self.assertIn(name, theirs, f"{name} is not a WPILib struct type")
+                self.assertEqual(theirs[name], text, name)
+
+    def test_schema_dependencies_come_before_the_types_that_use_them(self):
+        # Pose2d needs Translation2d and Rotation2d; Pose3d needs Translation3d
+        # and Rotation3d; Rotation3d needs Quaternion.
+        _, recs = decode(our_pose_file(0))
+        order = [name for name, _, _ in schema_view(recs)]
+        for needed, user in [("Translation2d", "Pose2d"), ("Rotation2d", "Pose2d"),
+                             ("Quaternion", "Rotation3d"), ("Rotation3d", "Pose3d"),
+                             ("Translation3d", "Pose3d")]:
+            self.assertLess(order.index(f"/.schema/struct:{needed}"),
+                            order.index(f"/.schema/struct:{user}"),
+                            f"{needed} must be declared before {user}")
 
     def test_poses_decode_with_wpilib_to_the_expected_field_pose(self):
         poses = scenario_poses()

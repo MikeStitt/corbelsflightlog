@@ -24,6 +24,8 @@ public void loop() {
 | `Pedro/Path` | The segment being followed. **Trajectory** |
 | `Pedro/Mode` | `FOLLOW`, `HOLD`, `MANUAL`, `IDLE` |
 | `Pedro/vel/*` | World-frame, body-frame and along-path speeds |
+| `Pedro/Speeds` | The same world-frame speeds as a `ChassisSpeeds`, in metres |
+| `Pedro/Twist` | Body-frame speeds as a `Twist2d`, in metres |
 
 The gap between `Pose` and `AimPose` is the tracking error. Because the aim
 point is the *nearest* point on the path rather than a time-based target, it

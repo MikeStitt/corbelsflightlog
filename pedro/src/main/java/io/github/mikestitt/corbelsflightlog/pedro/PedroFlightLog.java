@@ -33,6 +33,9 @@ import java.util.Map;
  */
 public final class PedroFlightLog {
 
+    /** Pedro works in inches; WPILib structs are metres. */
+    private static final double METRES_PER_INCH = 0.0254;
+
     /** Points sampled along the path segment when it changes. */
     private static final int PATH_SAMPLES = 20;
 
@@ -73,9 +76,14 @@ public final class PedroFlightLog {
         log.number(prefix + "/vel/vx_ips", v.vx);
         log.number(prefix + "/vel/vy_ips", v.vy);
         log.number(prefix + "/vel/omega_radps", v.omega);
+        // The same speeds as WPILib structs, in metres: AdvantageScope shows
+        // ChassisSpeeds and Twist2d as one value each rather than six numbers.
+        log.chassisSpeeds(prefix + "/Speeds", v.vx * METRES_PER_INCH, v.vy * METRES_PER_INCH, v.omega);
+
         Twist t = follower.twist();
         log.number(prefix + "/vel/forward_ips", t.vx);
         log.number(prefix + "/vel/strafe_ips", t.vy);
+        log.twist2d(prefix + "/Twist", t.vx * METRES_PER_INCH, t.vy * METRES_PER_INCH, t.omega);
         // Why the guard rather than calling tangentialVelocity() directly:
         // Observed 2026-09-22 against Pedro Pathing 3.0.1, in a
         // desktop JVM simulation (a stand-in drivetrain and localizer, no
