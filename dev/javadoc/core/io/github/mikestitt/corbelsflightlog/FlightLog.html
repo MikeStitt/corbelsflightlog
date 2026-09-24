@@ -404,8 +404,15 @@ loadScripts(document, 'script');</script>
 <h3>fieldQuarterTurns</h3>
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">fieldQuarterTurns</span></div>
 <div class="block">Counter-clockwise quarter turns from Pedro's axes to AdvantageScope's FTC
- axes. UNVERIFIED for BIOBUZZ: 1 is what another team used for DECODE's
- layout. Display only -- nothing on the robot reads it.</div>
+ axes. Display only -- nothing on the robot reads it.
+
+ <p><b>1 is verified for BIOBUZZ (2026-2027).</b> To check it for another
+ season, log a circle around the middle of the field and look at the four
+ axis crossings: Pedro (96,72,90deg) should draw right of centre facing up,
+ (72,96,180deg) above centre facing left, (48,72,270deg) left of centre
+ facing down, (72,48,0deg) below centre facing right. Each crossing has a
+ distinct position and heading, so a wrong turn or a mirrored axis shows up
+ at once -- which the shape of the circle alone would not reveal.</div>
 </section>
 </li>
 </ul>

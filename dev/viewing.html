@@ -249,48 +249,36 @@
 served by the Robot Controller itself, on the same port as Program &amp; Manage, so
 nothing needs installing.</p>
 <p>Or, over ADB (<code class="docutils literal notranslate"><span class="pre">adb</span> <span class="pre">connect</span> <span class="pre">192.168.43.1:5555</span></code>):</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>adb<span class="w"> </span>pull<span class="w"> </span>/sdcard/FIRST/logs<span class="w"> </span>.
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>adb<span class="w"> </span>pull<span class="w"> </span>/sdcard/corbelsflightlog<span class="w"> </span>.
 </pre></div>
 </div>
-<p>Files live in a <code class="docutils literal notranslate"><span class="pre">logs</span></code> folder inside the Robot Controller’s FIRST folder –
-internal storage on a Control Hub, not a removable card. If that folder can’t
-be used, <code class="docutils literal notranslate"><span class="pre">corbelsflightlog-ftc</span></code> falls back to the app’s own private storage;
-the page and the Driver Station both show which folder is in use. To log somewhere
-else entirely – a USB stick, say – call <code class="docutils literal notranslate"><span class="pre">FtcFlightLog.useDirectory(folder)</span></code>
-before opening.</p>
+<p>Files live in a <code class="docutils literal notranslate"><span class="pre">corbelsflightlog</span></code> folder in the Robot Controller’s own storage
+– internal storage on a Control Hub, not a removable card, despite <code class="docutils literal notranslate"><span class="pre">/sdcard</span></code>.
+The folder is named after the library so its size measures exactly what the
+logger is using. If it can’t be used, <code class="docutils literal notranslate"><span class="pre">corbelsflightlog-ftc</span></code> falls back to the
+app’s own private storage; the page and the Driver Station both show which
+folder is in use. To log somewhere else entirely – a USB stick, say – call
+<code class="docutils literal notranslate"><span class="pre">FtcFlightLog.useDirectory(folder)</span></code> before opening.</p>
 <p>The hub’s <strong>Download Logs</strong> button, on its Manage page, fetches the SDK’s
 <code class="docutils literal notranslate"><span class="pre">robotControllerLog.txt</span></code>, not these.</p>
 </section>
 <section id="housekeeping">
 <h2>Housekeeping<a class="headerlink" href="#housekeeping" title="Link to this heading">¶</a></h2>
-<p>Logs are capped at <strong>10 GiB</strong> in total. When a log is opened and the folder is
+<p>Logs are capped at <strong>2 GiB</strong> in total. When a log is opened and the folder is
 over that, the oldest <code class="docutils literal notranslate"><span class="pre">.wpilog</span></code> files are deleted until it fits. Change it with
 <code class="docutils literal notranslate"><span class="pre">FlightLog.maxDirectoryBytes</span></code>. Files that aren’t <code class="docutils literal notranslate"><span class="pre">.wpilog</span></code> are never touched.</p>
 </section>
-<section id="in-advantagescope">
-<h2>In AdvantageScope<a class="headerlink" href="#in-advantagescope" title="Link to this heading">¶</a></h2>
-<ol class="arabic simple">
-<li><p>Open the <code class="docutils literal notranslate"><span class="pre">.wpilog</span></code>. Channels appear in the sidebar as a tree.</p></li>
-<li><p><strong>2D Field</strong> tab: choose an FTC field (<code class="docutils literal notranslate"><span class="pre">FTC:Evergreen</span></code> if this season’s image
-isn’t available), then drag <code class="docutils literal notranslate"><span class="pre">Pedro/Pose</span></code> in as <strong>Robot</strong>, <code class="docutils literal notranslate"><span class="pre">Pedro/AimPose</span></code> as
-<strong>Ghost</strong>, <code class="docutils literal notranslate"><span class="pre">Pedro/Path</span></code> as <strong>Trajectory</strong>.</p></li>
-<li><p><strong>Line Graph</strong> tab: drag in numbers; strings and booleans go in its discrete
-section as labelled bands.</p></li>
-<li><p>Dragging the timeline moves every tab together.</p></li>
-</ol>
-</section>
-<section id="field-orientation">
-<h2>Field orientation<a class="headerlink" href="#field-orientation" title="Link to this heading">¶</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">FlightLog.pose(...)</span></code> converts Pedro coordinates — inches, origin in a field
-corner — into what AdvantageScope’s FTC fields expect: metres, origin at the
-field centre, turned by <code class="docutils literal notranslate"><span class="pre">FlightLog.fieldQuarterTurns</span></code>.</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>That turn depends on which wall is red, so it changes with the season. If the
-robot travels the wrong way on the field, set <code class="docutils literal notranslate"><span class="pre">fieldQuarterTurns</span></code> to 0, 1, 2 or
-3 until it matches. It only affects the display, and it’s applied when the file
-is written, so it changes future logs and not old ones.</p>
-</div>
+<section id="what-it-costs">
+<h2>What it costs<a class="headerlink" href="#what-it-costs" title="Link to this heading">¶</a></h2>
+<p>Small, but it depends entirely on how many channels you log, how often they
+change, and how fast your loop runs – so measure it on your own robot rather
+than trusting a number from someone else’s.</p>
+<p><code class="docutils literal notranslate"><span class="pre">Log</span> <span class="pre">8</span></code> in <code class="docutils literal notranslate"><span class="pre">checks/</span></code> makes storage writes visible in the loop-time spectrum if
+you want to see what they cost on your hardware. On the robot it was written
+for, they were far below the Driver Station’s own telemetry transmission, which
+<code class="docutils literal notranslate"><span class="pre">telemetry.setMsTransmissionInterval()</span></code> controls.</p>
+<p>This library writes each value as it is given, with its own timestamp, rather
+than accumulating a frame.</p>
 </section>
 </section>
 
@@ -352,8 +340,7 @@ is written, so it changes future logs and not old ones.</p>
 <li><a class="reference internal" href="#">Viewing a log</a><ul>
 <li><a class="reference internal" href="#getting-the-file-off-the-robot">Getting the file off the robot</a></li>
 <li><a class="reference internal" href="#housekeeping">Housekeeping</a></li>
-<li><a class="reference internal" href="#in-advantagescope">In AdvantageScope</a></li>
-<li><a class="reference internal" href="#field-orientation">Field orientation</a></li>
+<li><a class="reference internal" href="#what-it-costs">What it costs</a></li>
 </ul>
 </li>
 </ul>
