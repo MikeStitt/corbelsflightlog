@@ -56,6 +56,15 @@ public final class FtcFlightLog implements OpModeManagerNotifier.Notifications {
     private FtcFlightLog() {
     }
 
+    /**
+     * The folder logs go in, under the Robot Controller's storage -- so
+     * {@code /sdcard/corbelsflightlog} on a Control Hub. Named after the
+     * library rather than something generic like "logs" so that its size is a
+     * straight measure of what this library is using, and so it is easy to find
+     * at the top level.
+     */
+    static final String FOLDER_NAME = "corbelsflightlog";
+
     /** Set by {@link #useDirectory}; overrides the usual choice when set. */
     private static volatile File override;
 
@@ -97,11 +106,11 @@ public final class FtcFlightLog implements OpModeManagerNotifier.Notifications {
      * out from {@link #logDirectory} so it can be tested off a robot.
      */
     static File chooseDirectory(File firstFolder, File appFilesFolder) {
-        File preferred = firstFolder == null ? null : new File(firstFolder, "logs");
+        File preferred = firstFolder == null ? null : new File(firstFolder, FOLDER_NAME);
         if (usable(preferred)) return preferred;
-        File fallback = appFilesFolder == null ? null : new File(appFilesFolder, "logs");
+        File fallback = appFilesFolder == null ? null : new File(appFilesFolder, FOLDER_NAME);
         if (usable(fallback)) return fallback;
-        return preferred != null ? preferred : new File("logs");
+        return preferred != null ? preferred : new File(FOLDER_NAME);
     }
 
     /** True if the folder exists or can be created, and can be written to. */

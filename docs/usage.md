@@ -10,7 +10,7 @@ import io.github.mikestitt.corbelsflightlog.ftc.FtcFlightLog;
 
 private FlightLog log;
 
-@Override public void start() { log = FtcFlightLog.open(this); }   // /sdcard/FIRST/logs
+@Override public void start() { log = FtcFlightLog.open(this); }   // /sdcard/corbelsflightlog
 @Override public void loop()  { /* ... */ log.endLoop(); }
 @Override public void stop()  { log.close(); }
 ```

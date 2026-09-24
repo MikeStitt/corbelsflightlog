@@ -57,8 +57,8 @@ public class DiskBudgetTest {
     }
 
     @Test
-    public void theDefaultBudgetIsTenGibibytes() {
-        assertEquals(10L * 1024 * 1024 * 1024, savedCap);
+    public void theDefaultBudgetIsTwoGibibytes() {
+        assertEquals(2L * 1024 * 1024 * 1024, savedCap);
     }
 
     @Test

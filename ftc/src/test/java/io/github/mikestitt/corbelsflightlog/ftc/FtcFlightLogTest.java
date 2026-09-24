@@ -61,15 +61,24 @@ public class FtcFlightLogTest {
     @Test
     public void logsGoInALogsFolderInsideTheRobotControllersOwnFolder() throws IOException {
         File first = tmp.newFolder("FIRST");
-        assertEquals(new File(first, "logs"), FtcFlightLog.chooseDirectory(first, null));
-        assertTrue("created if missing", new File(first, "logs").isDirectory());
+        assertEquals(new File(first, FtcFlightLog.FOLDER_NAME),
+                FtcFlightLog.chooseDirectory(first, null));
+        assertTrue("created if missing",
+                new File(first, FtcFlightLog.FOLDER_NAME).isDirectory());
+    }
+
+    @Test
+    public void theFolderIsNamedAfterTheLibraryNotSomethingGeneric() {
+        // Its size is then a straight measure of what this library is using.
+        assertEquals("corbelsflightlog", FtcFlightLog.FOLDER_NAME);
     }
 
     @Test
     public void anUnusableFirstFolderFallsBackToTheAppsOwnStorage() throws IOException {
         File notAFolder = tmp.newFile("not-a-folder");     // a Control Hub with no usable FIRST
         File appFiles = tmp.newFolder("app-files");
-        assertEquals(new File(appFiles, "logs"), FtcFlightLog.chooseDirectory(notAFolder, appFiles));
+        assertEquals(new File(appFiles, FtcFlightLog.FOLDER_NAME),
+                FtcFlightLog.chooseDirectory(notAFolder, appFiles));
     }
 
     @Test

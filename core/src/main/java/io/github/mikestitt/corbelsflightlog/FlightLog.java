@@ -53,12 +53,19 @@ public final class FlightLog {
      * oldest {@code .wpilog} files are deleted until the total is under this.
      * Without it the folder grows until the device fills and logging stops.
      */
-    public static long maxDirectoryBytes = 10L * 1024 * 1024 * 1024;   // 10 GiB
+    public static long maxDirectoryBytes = 2L * 1024 * 1024 * 1024;   // 2 GiB
 
     /**
      * Counter-clockwise quarter turns from Pedro's axes to AdvantageScope's FTC
-     * axes. UNVERIFIED for BIOBUZZ: 1 is what another team used for DECODE's
-     * layout. Display only -- nothing on the robot reads it.
+     * axes. Display only -- nothing on the robot reads it.
+     *
+     * <p><b>1 is verified for BIOBUZZ (2026-2027).</b> To check it for another
+     * season, log a circle around the middle of the field and look at the four
+     * axis crossings: Pedro (96,72,90deg) should draw right of centre facing up,
+     * (72,96,180deg) above centre facing left, (48,72,270deg) left of centre
+     * facing down, (72,48,0deg) below centre facing right. Each crossing has a
+     * distinct position and heading, so a wrong turn or a mirrored axis shows up
+     * at once -- which the shape of the circle alone would not reveal.
      */
     public static int fieldQuarterTurns = 1;
 

@@ -10,44 +10,36 @@ nothing needs installing.
 Or, over ADB (`adb connect 192.168.43.1:5555`):
 
 ```sh
-adb pull /sdcard/FIRST/logs .
+adb pull /sdcard/corbelsflightlog .
 ```
 
-Files live in a `logs` folder inside the Robot Controller's FIRST folder --
-internal storage on a Control Hub, not a removable card. If that folder can't
-be used, `corbelsflightlog-ftc` falls back to the app's own private storage;
-the page and the Driver Station both show which folder is in use. To log somewhere
-else entirely -- a USB stick, say -- call `FtcFlightLog.useDirectory(folder)`
-before opening.
+Files live in a `corbelsflightlog` folder in the Robot Controller's own storage
+-- internal storage on a Control Hub, not a removable card, despite `/sdcard`.
+The folder is named after the library so its size measures exactly what the
+logger is using. If it can't be used, `corbelsflightlog-ftc` falls back to the
+app's own private storage; the page and the Driver Station both show which
+folder is in use. To log somewhere else entirely -- a USB stick, say -- call
+`FtcFlightLog.useDirectory(folder)` before opening.
 
 The hub's **Download Logs** button, on its Manage page, fetches the SDK's
 `robotControllerLog.txt`, not these.
 
 ## Housekeeping
 
-Logs are capped at **10 GiB** in total. When a log is opened and the folder is
+Logs are capped at **2 GiB** in total. When a log is opened and the folder is
 over that, the oldest `.wpilog` files are deleted until it fits. Change it with
 `FlightLog.maxDirectoryBytes`. Files that aren't `.wpilog` are never touched.
 
-## In AdvantageScope
+## What it costs
 
-1. Open the `.wpilog`. Channels appear in the sidebar as a tree.
-2. **2D Field** tab: choose an FTC field (`FTC:Evergreen` if this season's image
-   isn't available), then drag `Pedro/Pose` in as **Robot**, `Pedro/AimPose` as
-   **Ghost**, `Pedro/Path` as **Trajectory**.
-3. **Line Graph** tab: drag in numbers; strings and booleans go in its discrete
-   section as labelled bands.
-4. Dragging the timeline moves every tab together.
+Small, but it depends entirely on how many channels you log, how often they
+change, and how fast your loop runs -- so measure it on your own robot rather
+than trusting a number from someone else's.
 
-## Field orientation
+`Log 8` in `checks/` makes storage writes visible in the loop-time spectrum if
+you want to see what they cost on your hardware. On the robot it was written
+for, they were far below the Driver Station's own telemetry transmission, which
+`telemetry.setMsTransmissionInterval()` controls.
 
-`FlightLog.pose(...)` converts Pedro coordinates — inches, origin in a field
-corner — into what AdvantageScope's FTC fields expect: metres, origin at the
-field centre, turned by `FlightLog.fieldQuarterTurns`.
-
-:::{warning}
-That turn depends on which wall is red, so it changes with the season. If the
-robot travels the wrong way on the field, set `fieldQuarterTurns` to 0, 1, 2 or
-3 until it matches. It only affects the display, and it's applied when the file
-is written, so it changes future logs and not old ones.
-:::
+This library writes each value as it is given, with its own timestamp, rather
+than accumulating a frame.
