@@ -52,6 +52,18 @@ an integer, `5.0` a double, `5f` a float. One consequence -- a bare `null` is
 ambiguous between the array overloads, so cast it:
 `recordOutput("k", (double[]) null)`.
 
+Which calls convert from Pedro's frame and which write what you give them is
+set out in [Frames](frames.md), along with recipes for logging a pose for the
+field view, for the maths, or both.
+
+### A pose off the floor
+
+`pose(key, xIn, yIn, heightIn, headingRad)` writes a `Pose3d` from the same
+Pedro coordinates as `pose(...)` -- inches, corner origin, radians -- with a
+height in inches, and applies the same `fieldQuarterTurns` rotation. Use it
+rather than converting by hand: a `pose3d` built from raw metres lands in a
+different place on the field than the 2D pose beside it.
+
 ## Geometry
 
 WPILib struct types, which AdvantageScope draws on its 2D and 3D field tabs and

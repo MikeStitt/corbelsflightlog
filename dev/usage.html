@@ -3,7 +3,7 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Pedro Pathing" href="pedro.html"><link rel="prev" title="Installing" href="install.html">
+<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Frames" href="frames.html"><link rel="prev" title="Installing" href="install.html">
 
     <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
         <title>Logging values - corbelsflightlog dev</title>
@@ -193,6 +193,7 @@
   <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installing</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Logging values</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frames.html">Frames</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pedro.html">Pedro Pathing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="viewing.html">Viewing a log</a></li>
 <li class="toctree-l1"><a class="reference internal" href="format.html">The file format</a></li>
@@ -322,6 +323,17 @@ writes <code class="docutils literal notranslate"><span class="pre">raw</span></
 an integer, <code class="docutils literal notranslate"><span class="pre">5.0</span></code> a double, <code class="docutils literal notranslate"><span class="pre">5f</span></code> a float. One consequence – a bare <code class="docutils literal notranslate"><span class="pre">null</span></code> is
 ambiguous between the array overloads, so cast it:
 <code class="docutils literal notranslate"><span class="pre">recordOutput(&quot;k&quot;,</span> <span class="pre">(double[])</span> <span class="pre">null)</span></code>.</p>
+<p>Which calls convert from Pedro’s frame and which write what you give them is
+set out in <a class="reference internal" href="frames.html"><span class="std std-doc">Frames</span></a>, along with recipes for logging a pose for the
+field view, for the maths, or both.</p>
+</section>
+<section id="a-pose-off-the-floor">
+<h3>A pose off the floor<a class="headerlink" href="#a-pose-off-the-floor" title="Link to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">pose(key,</span> <span class="pre">xIn,</span> <span class="pre">yIn,</span> <span class="pre">heightIn,</span> <span class="pre">headingRad)</span></code> writes a <code class="docutils literal notranslate"><span class="pre">Pose3d</span></code> from the same
+Pedro coordinates as <code class="docutils literal notranslate"><span class="pre">pose(...)</span></code> – inches, corner origin, radians – with a
+height in inches, and applies the same <code class="docutils literal notranslate"><span class="pre">fieldQuarterTurns</span></code> rotation. Use it
+rather than converting by hand: a <code class="docutils literal notranslate"><span class="pre">pose3d</span></code> built from raw metres lands in a
+different place on the field than the 2D pose beside it.</p>
 </section>
 </section>
 <section id="geometry">
@@ -420,12 +432,12 @@ robot loses power, the last second or so is lost; <code class="docutils literal 
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="pedro.html">
+          <a class="next-page" href="frames.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Pedro Pathing</div>
+                <div class="title">Frames</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
@@ -474,6 +486,7 @@ robot loses power, the last second or so is lost; <code class="docutils literal 
 <li><a class="reference internal" href="#opening-and-closing-a-log">Opening and closing a log</a></li>
 <li><a class="reference internal" href="#the-value-types">The value types</a><ul>
 <li><a class="reference internal" href="#strings-and-bytes">Strings and bytes</a></li>
+<li><a class="reference internal" href="#a-pose-off-the-floor">A pose off the floor</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#geometry">Geometry</a><ul>
