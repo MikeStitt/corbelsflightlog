@@ -27,6 +27,7 @@ FlightLog.event("kicker fired");           // one-off, with its exact time
 
 install
 usage
+frames
 pedro
 viewing
 format

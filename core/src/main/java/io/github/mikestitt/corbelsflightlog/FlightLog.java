@@ -279,6 +279,28 @@ public final class FlightLog {
     }
 
     /**
+     * A Pedro pose lifted off the floor, drawn on AdvantageScope's 3D field.
+     *
+     * <p>Takes the same Pedro coordinates as {@link #pose} -- inches, corner
+     * origin, radians -- plus a height in inches, and applies the same
+     * {@link #fieldQuarterTurns} rotation. Use this rather than converting by
+     * hand: a 3D pose built from raw metres will sit at a different place on
+     * the field than the 2D one, which is exactly the bug it replaces.
+     */
+    public void pose(String key, double xIn, double yIn, double heightIn, double headingRad) {
+        if (writer == null || !isFinite(xIn) || !isFinite(yIn)
+                || !isFinite(heightIn) || !isFinite(headingRad)) {
+            return;
+        }
+        encodePose(poseBuffer, 0, xIn, yIn, headingRad);
+        double fx = readDouble(poseBuffer, 0);
+        double fy = readDouble(poseBuffer, 8);
+        double heading = readDouble(poseBuffer, 16);
+        pose3d(key, fx, fy, heightIn * METERS_PER_INCH,
+                Math.cos(heading / 2), 0, 0, Math.sin(heading / 2));
+    }
+
+    /**
      * Several Pedro poses -- a path, a list of targets -- as one
      * {@code Pose2d[]}, which AdvantageScope draws as a trajectory. The array
      * is {@code {x0, y0, heading0, x1, y1, heading1, ...}} in Pedro inches and
@@ -652,6 +674,14 @@ public final class FlightLog {
         putDouble(buf, offset, fx + 0.0);   // + 0.0 turns -0.0 into 0.0
         putDouble(buf, offset + 8, fy + 0.0);
         putDouble(buf, offset + 16, heading);
+    }
+
+    private static double readDouble(byte[] buf, int offset) {
+        long bits = 0;
+        for (int i = 7; i >= 0; i--) {
+            bits = (bits << 8) | (buf[offset + i] & 0xFFL);
+        }
+        return Double.longBitsToDouble(bits);
     }
 
     private long now() {

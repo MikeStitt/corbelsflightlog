@@ -54,7 +54,15 @@ public final class PedroFlightLog {
         log.chassisSpeeds(key, velocity.vx * METRES_PER_INCH, velocity.vy * METRES_PER_INCH, velocity.omega);
     }
 
-    /** Pedro works in inches; WPILib structs are metres. */
+    /**
+     * Pedro works in inches; WPILib structs are metres.
+     *
+     * <p>Poses are also rotated into the field frame AdvantageScope draws, by
+     * {@code FlightLog.fieldQuarterTurns}. Speeds are NOT: {@code /Speeds} is a
+     * ChassisSpeeds along Pedro's axes. Magnitudes, graphs and tables read the
+     * same either way; it matters only if you draw the velocity as an arrow on
+     * the field. See the Frames page in the docs.
+     */
     private static final double METRES_PER_INCH = 0.0254;
 
     /** Points sampled along the path segment when it changes. */
