@@ -10,13 +10,31 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.MikeStitt.corbelsflightlog:corbelsflightlog-core:v0.1.0'
+    implementation 'com.github.MikeStitt.corbelsflightlog:corbelsflightlog-core:v0.2.1'
     // optional, if you use Pedro Pathing:
-    implementation 'com.github.MikeStitt.corbelsflightlog:corbelsflightlog-pedro:v0.1.0'
-    // optional, for the Control Hub and Panels glue:
-    implementation 'com.github.MikeStitt.corbelsflightlog:corbelsflightlog-ftc:v0.1.0'
+    implementation 'com.github.MikeStitt.corbelsflightlog:corbelsflightlog-pedro:v0.2.1'
+    // optional, if you already use WPILib geometry types:
+    implementation 'com.github.MikeStitt.corbelsflightlog:corbelsflightlog-wpilib:v0.2.1'
+    // the Control Hub and Panels glue -- see the note below:
+    implementation 'com.github.MikeStitt.corbelsflightlog:corbelsflightlog-ftc:v0.2.1'
 }
 ```
+
+### About `corbelsflightlog-ftc`
+
+It is an Android library rather than a plain jar, so JitPack has to build it
+with an Android SDK. **v0.2.1 is the first release that attempts this**, and the
+attempt is allowed to fail without taking the other three modules with it.
+
+Check whether it worked before relying on it:
+
+```
+https://jitpack.io/com/github/MikeStitt/corbelsflightlog/v0.2.1/build.log
+```
+
+If `-ftc` is not there, build it yourself -- clone this repository and run
+`./gradlew publishToMavenLocal`, then add `mavenLocal()` to your repositories.
+The other three modules are plain Java and are unaffected.
 
 JitPack builds a tag the first time someone asks for it, so the first download
 of a new version is slow. After that it's cached.
